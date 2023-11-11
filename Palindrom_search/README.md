@@ -10,7 +10,7 @@
 ## Build (Сборка)
 
 ```
-cd ~/Algorithms/Palindrom-search/
+cd ~/Algorithms/Palindrom_search/
 bazel build //sources:palindrom-search-fsm
 ```
 
@@ -23,8 +23,11 @@ bazel build //sources:palindrom_search_fsm_lib
 ## Run (Запуск)
 
 ```
-cd ~/Algorithms/Palindrom-search/
+cd ~/Algorithms/Palindrom_search/
 bazel-bin/sources/palindrom-search-fsm
 ```
-
-
+## TEST (Тестирование)
+```
+cd ~/Algorithms/Palindrom_search/
+bazel test --cxxopt=-std=c++17 --test_output=all //tests:palindrom_srch_test 
+```
