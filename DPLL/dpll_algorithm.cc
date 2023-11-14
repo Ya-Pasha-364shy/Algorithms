@@ -8,10 +8,9 @@
 using namespace std;
 /*
  * @brief
- * Здесь представлен алгоритм DPLL,
- * предназначенный для того, чтобы делать
- * вердикт о конъюнктивной нормальной форме о
- * том, является ли она выполнимой или нет.
+ * Здесь представлен алгоритм DPLL, использующий только
+ * правило распространения единицы и предназначенный для того,
+ * чтобы делать вердикт о выполнении КНФ, заданной формулой.
  * 
  * Если формула выполнима, то программа возвращает - SAT,
  *                                           иначе - UNSAT.
@@ -36,6 +35,7 @@ static void print_clauses(const vector<T> vector)
 
 int main(int argc, char * argv[])
 {
+	bool rc;
 	ifstream cnf;
 	string path_to_cnf;
 	vector<string> clause_sequences;
@@ -57,11 +57,17 @@ int main(int argc, char * argv[])
 			std::string tmp_line;
 			getline(cnf, tmp_line);
 
+			if (tmp_line.empty())
+				continue;
+
 			if (tmp_line.find(COMMENT_SIGNATURE)   == 0 or
 			    tmp_line.find(PREAMBULE_SIGNATURE) == 0)
 				continue;
 
-			if (string::npos != (idx = tmp_line.find('0')))
+			if (tmp_line.find(TEST_END_SIGNATURE)  == 0)
+				break;
+
+			if (string::npos != (idx = tmp_line.find(" 0")))
 			{
 				if (idx == (tmp_line.size() - 1))
 				{
@@ -100,14 +106,13 @@ int main(int argc, char * argv[])
 		cerr << "Unable to open .cnf file" << endl;
 		return EXIT_FAILURE;
 	}
-
 	dpll_sequence dpll(clause_sequences);
 
-	print_clauses(dpll.get_clauses());
-	std::cout << "ORCHESTRATOR START !" << std::endl;
-
-	dpll.dpll_orchestrator();
-
+	rc = dpll.dpll_orchestrator();
+	if (rc)
+		cout << "SAT" << endl;
+	else
+		cout << "UNSAT" << endl;
 
 	return EXIT_SUCCESS;
 }

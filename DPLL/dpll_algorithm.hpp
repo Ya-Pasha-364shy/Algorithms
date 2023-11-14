@@ -13,22 +13,32 @@
 
 #define COMMENT_SIGNATURE 'c'
 #define PREAMBULE_SIGNATURE 'p'
+#define TEST_END_SIGNATURE '%'
+#define NEW_LINE_SIGNATURE "\n"
 
 class dpll_sequence
 {
 private:
 	bool dpll_contradiction_ = false;
 
-	std::set<int> dpll_literals_;
-	std::set<int> dpll_literals_saved_;
+	std::set<int> dpll_literals_all_saved_leaking_;
+	std::set<int> dpll_literals_all_saved_;
+
+	std::set<int> dpll_literals_proposed_leaking_;
+	std::set<int> dpll_literals_proposed_;
+
+	std::set<size_t> dpll_clause_idxs;
 
 	std::vector<std::list<int>> dpll_clauses_; // S
 public:
+	bool occurs_literals_inited = false;
+	std::map<int, std::list<size_t>> occurs_literals_;
+
 	dpll_sequence() = delete;
 	dpll_sequence(std::vector<std::string> & dpll_clauses);
 
 	/* helpers */
-	std::vector<std::list<int>> & get_clauses()
+	std::vector<std::list<int>> get_clauses()
 	{
 		return dpll_clauses_;
 	}
@@ -46,44 +56,79 @@ public:
 	 * 
 	 * Полезная нагрузка относительно последовательности предложений:
 	 * Удаляет клаузы, которые несут в себе литерал L (так как они уже правда).
+	 * 
+	 * DEPRECATED (в этом задании).
 	*/
-	void dpll_monotone_variable_fixing();
+	// void dpll_monotone_variable_fixing();
+
+	/*
+	 * @brief
+	 * Заполняет множество индексов клауз, подлежащих удалению относительно предложенных 
+	 * единичных литералов.
+	*/
+	void dpll_clauses_of_proposed();
+
+	void dpll_init_map_of_occurences();
+
+	/*
+	* @brief
+	* Выбирает наиболее часто встерчающийся литерал в клаузах всей формулы.
+	* возвращает 0, если формула пуста.
+	*/
+	int dpll_choice_literal();
 
 	/* @brief
 	 * Пока последовательность предложений содержит одиночную клаузу - предложение,
 	 * имеющее один литерал - устанавливаем его значение = true. Удаляет все клаузы,
-	 * которые содержат данный литерал, а также появление всех контрарных литералов.
+	 * которые содержат данный литерал, а также появление контрарного литерала.
 	 * 
 	 * Может найти противоречие. Если контрарный литерал был удалён из одиночной клаузы,
 	 * значит, что возникло противоречие.
+	 * 
+	 * Используется правило распространения единицы !
 	*/
-	void dpll_unit_resolution();
+	void dpll_unit_resolution(int literal);
 
 	/* @brief
 	 * Выбирает литерал, любой без отрицания, такой, что ещё не был выбран
 	 * из всей формулы. Затем удаляет этот литерал, т.к. он уже был выбран для
-	 * упрощения формулы
+	 * упрощения формулы.
 	*/
 	int dpll_get_and_erase_literal();
 
-	/* @brief
-	 * Обновляет "ведро воды" dpll_literals_;
+	/*
+	 * @brief
+	 * тоже самое но среди предложенных
 	*/
-	friend void refresh_water_bucket(dpll_sequence * obj)
+	int dpll_get_and_erase_literal_from_proposed();
+
+	void dpll_remove_inverse_occurences();
+
+	void dpll_remove_inverse_occurences(int literal);
+
+	/* @brief
+	 * Обновляет "вёдра воды";
+	*/
+	friend void refresh_water_buckets(dpll_sequence * obj)
 	{
-		obj->dpll_literals_ = obj->dpll_literals_saved_;
+		if (obj->dpll_literals_all_saved_leaking_.empty())
+			obj->dpll_literals_all_saved_leaking_ = obj->dpll_literals_all_saved_;
+		else if (obj->dpll_literals_proposed_leaking_.empty())
+			obj->dpll_literals_proposed_leaking_ = obj->dpll_literals_proposed_;
 	}
 
 	/* @brief
-	 * Выбирает литерал, любой без отрицания, из всей формулы.
+	 * Возвращает любой литерал (без отрицания) из всей формулы.
+	 * Нужно будет пройтись по всем клаузам и посмотреть, какой литерал встречается
+	 * чаще всего и выбрать его. Также - с отрицательным
 	*/
 	int dpll_get_literal();
 
 	/* @brief
-	 * Задаёт шаг. Выполняет первые два метода, если S (`clauses_`) пустое, то
-	 * говорим, что формула выполнима (SAT), иначе - невыполнима (UNSAT).
+	 * Задаёт шаг.Возвращает `true`, если формула выполнятся.
+	 * Иначе - false.
 	*/
-	void dpll_orchestrator();
+	bool dpll_orchestrator();
 
 	/* destructor */
 	virtual ~dpll_sequence() = default;
@@ -110,46 +155,37 @@ dpll_sequence::dpll_sequence(std::vector<std::string> & dpll_clauses)
 	int number;
 	std::list<int> tmp_clause;
 
-	for (auto line: dpll_clauses)
+	for (std::string line: dpll_clauses)
 	{
+		if (line.empty())
+			continue;
+
 		std::istringstream stream(line);
 		while (stream >> number)
 		{
 			tmp_clause.emplace_back(number);
-			dpll_literals_.insert(abs(number));
+			if (number > 0)
+				dpll_literals_all_saved_leaking_.insert(number);
+			else
+				dpll_literals_all_saved_leaking_.insert(abs(number));
 		}
 
 		dpll_clauses_.emplace_back(tmp_clause);
 		tmp_clause.clear();
 	}
-	dpll_literals_saved_ = dpll_literals_;
-
-	std::cout << "dpll_literals_ = [ ";
-	for (auto it = dpll_literals_.begin(); it != dpll_literals_.end(); it++)
-	{
-		std::cout << *it << " ";
-	}
-	std::cout << "];" << std::endl;
+	print_clauses(dpll_clauses_);
+	dpll_literals_all_saved_ = dpll_literals_all_saved_leaking_;
 }
 
-/*
- * @brief
- * возвращает 0, если все элементы закончились,
- * иначе возвращает литерал
+/* @brief
+ * infinite water backet
 */
-int dpll_sequence::dpll_get_and_erase_literal()
-{
-	int returned_value = *dpll_literals_.end();
-	dpll_literals_.erase(returned_value);
-	return returned_value;
-}
-
 int dpll_sequence::dpll_get_literal()
 {
-	static std::set<int>::iterator lit = dpll_literals_saved_.begin();
+	static std::set<int>::iterator lit = dpll_literals_all_saved_.begin();
 	int returned_value;
 
-	if (lit != dpll_literals_saved_.end())
+	if (lit != dpll_literals_all_saved_.end())
 	{
 		returned_value = *lit;
 		++lit;
@@ -157,12 +193,141 @@ int dpll_sequence::dpll_get_literal()
 	}
 	else
 	{
-		lit = dpll_literals_saved_.begin();
+		lit = dpll_literals_all_saved_.begin();
 		returned_value = *lit;
 		return returned_value;
 	}
 }
 
+int dpll_sequence::dpll_get_and_erase_literal()
+{
+	int returned_value = *dpll_literals_all_saved_leaking_.begin();
+	dpll_literals_all_saved_leaking_.erase(returned_value);
+	return returned_value;
+}
+
+int dpll_sequence::dpll_get_and_erase_literal_from_proposed()
+{
+	int returned_value = *(dpll_literals_proposed_leaking_.begin());
+	dpll_literals_proposed_leaking_.erase(returned_value);
+	return returned_value;
+}
+
+void dpll_sequence::dpll_init_map_of_occurences()
+{
+	if (occurs_literals_inited)
+		return;
+	else
+	{
+		bool found;
+		int literal;
+		size_t number_of_clauses = dpll_clauses_.size();
+
+		while (0 != (literal = dpll_get_and_erase_literal()))
+		{
+			unsigned occurences_of_literal = 0;
+			std::list<size_t> tmp_occurences_of_literal;
+
+			for (size_t i = 0; i < number_of_clauses; i++)
+			{
+				auto fixed = dpll_clauses_[i];
+				found = (std::find(fixed.begin(), fixed.end(), literal) != fixed.end());
+				if (found)
+					tmp_occurences_of_literal.emplace_back(i);
+			}
+			occurs_literals_[literal] = std::move(tmp_occurences_of_literal);
+		}
+		refresh_water_buckets(this);
+	}
+
+}
+
+int dpll_sequence::dpll_choice_literal()
+{
+	if (dpll_clauses_.empty())
+		return 0;
+
+	dpll_init_map_of_occurences();
+
+	auto max_pair = std::max_element(occurs_literals_.begin(), occurs_literals_.end(),
+	                    [] (const std::pair<int, std::list<size_t>> & less, const std::pair<int, std::list<size_t>> & greater)
+	                    {
+	                        return less.second.size() < greater.second.size();
+	                    });
+	return max_pair->first;
+}
+
+void dpll_sequence::dpll_clauses_of_proposed()
+{
+	bool found;
+	int literal;
+	size_t number_of_clauses = dpll_clauses_.size();
+
+	while (0 != (literal = dpll_get_and_erase_literal_from_proposed()))
+	{
+		for (size_t i = 0; i < number_of_clauses; i++)
+		{
+			auto fixed = dpll_clauses_[i];
+			found = (std::find(fixed.begin(), fixed.end(), literal) != fixed.end());
+			if (found)
+				dpll_clause_idxs.insert(i);
+		}
+	}
+	refresh_water_buckets(this);
+}
+
+inline int inverse(int positive)
+{
+	return positive * (-1);
+}
+
+void dpll_sequence::dpll_remove_inverse_occurences()
+{
+	int literal;
+	size_t number_of_clauses = dpll_clauses_.size();
+
+	while (0 != (literal = dpll_get_and_erase_literal_from_proposed()))
+	{
+		for (size_t i = 0; i < number_of_clauses; i++)
+		{
+			auto & fixed = dpll_clauses_[i];
+			auto to_remove = std::find(fixed.begin(), fixed.end(), inverse(literal));
+			if (to_remove != fixed.end())
+			{
+				if (fixed.size() == 1)
+				{
+					dpll_contradiction_ = true;
+					dpll_clauses_.erase(dpll_clauses_.begin() + i);
+					return;
+				}
+				fixed.erase(to_remove);
+			}
+		}
+	}
+}
+
+void dpll_sequence::dpll_remove_inverse_occurences(int literal)
+{
+	size_t number_of_clauses = dpll_clauses_.size();
+
+	for (size_t i = 0; i < number_of_clauses; i++)
+	{
+		auto & fixed = dpll_clauses_[i];
+		auto to_remove = std::find(fixed.begin(), fixed.end(), inverse(literal));
+		if (to_remove != fixed.end())
+		{
+			if (fixed.size() == 1)
+			{
+				dpll_contradiction_ = true;
+				dpll_clauses_.erase(dpll_clauses_.begin() + i);
+				return;
+			}
+			fixed.erase(to_remove);
+		}
+	}
+}
+
+/* DEPRECATED
 void dpll_sequence::dpll_monotone_variable_fixing()
 {
 	bool found;
@@ -185,11 +350,12 @@ void dpll_sequence::dpll_monotone_variable_fixing()
 		}
 		monotonic_occurs_literals[literal] = std::move(tmp_list_positions);
 	}
+	refresh_water_bucket(this);
 
 	for (auto & literal_occurs: monotonic_occurs_literals)
 	{
 		auto occurences = literal_occurs.second;
-		for (auto it = occurences.begin();  occurences.size() > 1 && it != occurences.end(); it++)
+		for (auto it = occurences.begin(); occurences.size() > 1 && it != occurences.end(); it++)
 		{
 			unique_occur_positions.insert(*it);
 		}
@@ -200,48 +366,138 @@ void dpll_sequence::dpll_monotone_variable_fixing()
 	{
 		dpll_clauses_.erase(beg_it + occurence);
 	}
+}
+*/
 
-	// std::cout << "SUCCESS" << std::endl;
-	// print_clauses(dpll_clauses_);
+void dpll_sequence::dpll_unit_resolution(int literal)
+{
+	size_t number_of_clauses = dpll_clauses_.size();
+	if (not literal)
+	{
+		for (size_t i = 0; i < number_of_clauses; i++)
+		{
+			if (dpll_clauses_[i].size() == 1)
+			{
+				// сохраняем литералы всех единичных клауз
+				dpll_literals_proposed_leaking_.insert(*dpll_clauses_[i].begin());
+			}
+		}
+		if (not dpll_literals_proposed_leaking_.empty())
+		{
+			dpll_literals_proposed_ = dpll_literals_proposed_leaking_;
 
-	refresh_water_bucket(this);
+			dpll_clauses_of_proposed();
+			if (not dpll_clause_idxs.empty())
+			{
+				// удаляем из формулы все клаузы, содержащие единицы
+				auto begin_clauses_it = dpll_clauses_.begin();
+				for (size_t idx: dpll_clause_idxs)
+				{
+					// нужно ли удалять единичные клаузы, литералы которых были выбраны для выполнения правила ?
+					dpll_clauses_.erase(begin_clauses_it + idx);
+				}
+			}
+			// удаляем из формулы все появления обратных единиц
+			dpll_remove_inverse_occurences();
+			if (dpll_contradiction_)
+			{
+				// конфликт
+				return;
+			}
+		}
+		else
+		{
+			// единичных клауз нет
+			return;
+		}
+	}
+	else if (literal != 0)
+	{
+		if (not occurs_literals_[literal].empty() and not dpll_clauses_.empty())
+		{
+			auto begin_clauses_it = dpll_clauses_.begin();
+			for (size_t idx: occurs_literals_[literal])
+			{
+				// нужно ли удалять единичную клаузу, литерал которой был выбран для выполнения правила ?
+				dpll_clauses_.erase(begin_clauses_it + idx);
+			}
+			// удаляем появления обратных единиц
+			dpll_remove_inverse_occurences(literal);
+			if (dpll_contradiction_)
+			{
+				return;
+			}
+		}
+	}
+	return;
 }
 
-void dpll_sequence::dpll_unit_resolution()
+bool dpll_sequence::dpll_orchestrator()
 {
+	int tmp_literal_first = 0;
+	int tmp_literal_second = 0;
+	std::list<int> tmp;
 
-}
-
-void dpll_sequence::dpll_orchestrator()
-{
 	while (true)
 	{
-		dpll_monotone_variable_fixing();
-		dpll_unit_resolution();
+		if (not tmp_literal_first and not tmp_literal_second)
+		{
+			dpll_unit_resolution(0);
+		}
+		else
+		{
+			if (tmp_literal_first)
+			{
+				dpll_unit_resolution(tmp_literal_first);
+			}
+			if (tmp_literal_second && not dpll_clauses_.empty())
+			{
+				tmp.push_back(tmp_literal_second);
+				dpll_clauses_.emplace_back(std::move(tmp));
+				if (occurs_literals_.find(tmp_literal_second) != occurs_literals_.end())
+				{
+					std::list<size_t> tmp_occurence; tmp_occurence.push_back(dpll_clauses_.size() - 1);
+					occurs_literals_[tmp_literal_second] = std::move(tmp_occurence);
+				}
+				else
+				{
+					occurs_literals_[tmp_literal_second].emplace_back(dpll_clauses_.size() - 1);
+				}
+				dpll_unit_resolution(tmp_literal_second);
+			}
+		}
 
 		if (dpll_contradiction_)
 		{
-			std::cout << "UNSAT" << std::endl;
-			return;
+			return false;
 		}
 		if (dpll_clauses_.empty())
 		{
-			std::cout << "SAT" << std::endl;
-			return;
+			return true;
 		}
-		// int literal = dpll_get_and_erase_literal();
 
-		// if (literal)
-		// 	std::cout << literal << std::endl;
-		// else
-		// 	break;
-		break;
+		// избавляемся от прошлых литералов, чтобы взять новые
+		if (tmp_literal_first)
+		{
+			occurs_literals_.erase(tmp_literal_first);
+		}
+		if (tmp_literal_second)
+		{
+			occurs_literals_.erase(tmp_literal_second);
+		}
 
-		// while (true)
-		// {
+		tmp_literal_first = dpll_choice_literal();
+		if (not tmp_literal_first)
+			return true;
 
-		// }
+		tmp_literal_second = inverse(tmp_literal_first);
+
+		tmp.push_back(tmp_literal_first);
+		dpll_clauses_.emplace_back(std::move(tmp));
+		occurs_literals_[tmp_literal_first].emplace_back(dpll_clauses_.size() - 1);
 	}
+
+	return false;
 }
 
 #endif // DPLL_ALGORITHM_H_
