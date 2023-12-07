@@ -1,0 +1,36 @@
+%start PhonerLineFSM::Idle
+%header PhonerLine.h
+%class PhonerLine
+%package PhonerLine
+
+%map PhonerLineFSM
+%%
+Conversation
+{
+	invalidNumber	Conversation	{continues();}
+	validNumber	Conversation	{continues();}
+	onHook	Idle	{disconnectedLine();}
+}
+
+Warning
+{
+	onHook	Idle	{disconnectedLine();}
+	invalidNumber	Warning	{slowBusyTone();}
+	validNumber	Warning	{slowBusyTone();}
+}
+
+Ready
+Entry {startTimer();}
+Exit {stopTimer();}
+{
+	onHook	Idle	{disconnectedLine();}
+	invalidNumber	Warning	{playMessage();}
+	validNumber	Conversation	{findConnection();}
+}
+
+Idle
+{
+	offHook	Ready	{soundDialTone();}
+}
+
+%%
