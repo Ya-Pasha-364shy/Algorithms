@@ -45,10 +45,12 @@ void PhonerLineFSM_Idle::ReceiveStimulusAndDoTransition(PhonerLineContext& conte
 	}
 	else if (streq(input_stimulus, TICK_STIMULUS))
 	{
+		// a loop into itself
 		ctx.response() = "I";
 	}
 	else
 	{
+		/* nothing */
 		ctx.response() = "nul";
 	}
 	return;
@@ -57,27 +59,31 @@ void PhonerLineFSM_Idle::ReceiveStimulusAndDoTransition(PhonerLineContext& conte
 void PhonerLineFSM_Ready::Entry(PhonerLineContext& context)
 {
 	PhonerLine & ctx = context.getOwner();
-	ctx.startTimer(context);
+	if (ctx.checkRunningStateTimer() == false)
+	{
+		ctx.reloadTimerTask();
+		ctx.startTimer(context);
+	}
+	else
+	{
+		std::cerr << "Unable to reload timer with timertask, because its already running !" << std::endl;
+	}
 	return;
 }
 
-bool PhonerLineFSM_Ready::Exit(PhonerLineContext& context)
+int PhonerLineFSM_Ready::Exit(PhonerLineContext& context)
 {
 	PhonerLine & ctx = context.getOwner();
-	unsigned ticksByFact = ctx.stopTimer();
+	int ticksByFact = ctx.stopTimer();
 	
 	if (ticksByFact == TIMERTASK_TIMEOUT_3_SEC)
 	{
 		context.setState(PhonerLineFSM::Warning);
-		return false;
 	}
-	else
-	{
-		return true;
-	}
+	return ticksByFact;
 }
 
-inline void redirectInputStimulusToWarning(PhonerLineContext& context)
+inline void redirectInputStimulusToWarningState(PhonerLineContext& context)
 {
 	context.setState(PhonerLineFSM::Warning);
 	PhonerLineFSM::Warning.ReceiveStimulusAndDoTransition(context);
@@ -94,38 +100,38 @@ void PhonerLineFSM_Ready::ReceiveStimulusAndDoTransition(PhonerLineContext& cont
 
 	if (streq(input_stimulus, ON_HOOK_STIMULUS))
 	{
-		if (PhonerLineFSM::Ready.Exit(context))
+		if (PhonerLineFSM::Ready.Exit(context) != TIMERTASK_TIMEOUT_3_SEC)
 		{
 			ctx.disconnectedLine();
 			context.setState(PhonerLineFSM::Idle);
 		}
 		else
 		{
-			return redirectInputStimulusToWarning(context);
+			return redirectInputStimulusToWarningState(context);
 		}
 	}
 	else if (streq(input_stimulus, VALID_NUMBER_STIMULUS))
 	{
-		if (PhonerLineFSM::Ready.Exit(context))
+		if (PhonerLineFSM::Ready.Exit(context) != TIMERTASK_TIMEOUT_3_SEC)
 		{
 			ctx.findConnection();
 			context.setState(PhonerLineFSM::Conversation);
 		}
 		else
 		{
-			return redirectInputStimulusToWarning(context);
+			return redirectInputStimulusToWarningState(context);
 		}
 	}
 	else if (streq(input_stimulus, INVALID_NUMBER_STIMULUS))
 	{
-		if (PhonerLineFSM::Ready.Exit(context))
+		if (PhonerLineFSM::Ready.Exit(context) != TIMERTASK_TIMEOUT_3_SEC)
 		{
 			ctx.playMessage();
 			context.setState(PhonerLineFSM::Warning);
 		}
 		else
 		{
-			return redirectInputStimulusToWarning(context);
+			return redirectInputStimulusToWarningState(context);
 		}
 	}
 	else if (streq(input_stimulus, TICK_STIMULUS))
@@ -133,7 +139,6 @@ void PhonerLineFSM_Ready::ReceiveStimulusAndDoTransition(PhonerLineContext& cont
 		/* Only for this state a transition to another state is provided by timeout.
 		   Until the timeout occurs, we are in the same state with the "I" output */
 		ctx.response() = "I";
-		// ADD CHECK, THAT TASK IS STILL RUNNING
 	}
 	else
 	{
@@ -151,7 +156,7 @@ void PhonerLineFSM_Warning::ReceiveStimulusAndDoTransition(PhonerLineContext& co
 
 	if (streq(input_stimulus, VALID_NUMBER_STIMULUS) or streq(input_stimulus, INVALID_NUMBER_STIMULUS))
 	{
-		// a loop
+		// a loop into itself
 		ctx.slowBusyTone();
 	}
 	else if (streq(input_stimulus, ON_HOOK_STIMULUS))
@@ -161,10 +166,12 @@ void PhonerLineFSM_Warning::ReceiveStimulusAndDoTransition(PhonerLineContext& co
 	}
 	else if (streq(input_stimulus, TICK_STIMULUS))
 	{
+		// a loop into itself
 		ctx.response() = "I";
 	}
 	else
 	{
+		/* nothing */
 		ctx.response() = "nul";
 	}
 }
@@ -179,7 +186,7 @@ void PhonerLineFSM_Conversation::ReceiveStimulusAndDoTransition(PhonerLineContex
 
 	if (streq(input_stimulus, VALID_NUMBER_STIMULUS) or streq(input_stimulus, INVALID_NUMBER_STIMULUS))
 	{
-		// a loop
+		// a loop into itself
 		ctx.continues();
 	}
 	else if (streq(input_stimulus, ON_HOOK_STIMULUS))
@@ -189,10 +196,12 @@ void PhonerLineFSM_Conversation::ReceiveStimulusAndDoTransition(PhonerLineContex
 	}
 	else if (streq(input_stimulus, TICK_STIMULUS))
 	{
+		// a loop into itself
 		ctx.response() = "I";
 	}
 	else
 	{
+		/* nothing */
 		ctx.response() = "nul";
 	}
 }

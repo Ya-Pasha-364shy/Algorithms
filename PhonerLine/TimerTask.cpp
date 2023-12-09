@@ -4,24 +4,27 @@ using namespace PhonerLine;
 
 void TimerTask::timerTaskRun()
 {
-	while (timerSecond_ < secondsForTask_)
+	taskIsRunning_ = true;
+	while (timerSecond_ < secondsForTask_ and not needToStop_)
 	{
-		taskIsRunning_ = true;
-		if (needToStop_) break;
-
-		sleep(1);
 		timerSecond_++;
+		sleep(1); // wait a second
+
+		if (needToStop_)
+		{
+			taskIsRunning_ = false;
+			break;
+		}
 	}
 	if (needToStop_ != true and timerSecond_ == secondsForTask_)
 	{
 		taskIsReady_ = true;
-		taskIsRunning_ = false;
 	}
 	else
 	{
-		std::cout << "CLEAN..." << std::endl;
-		timerTaskClean();
+		needToStop_ = false;
 	}
+	taskIsRunning_ = false;
 }
 
 void TimerTask::timerTaskClean()

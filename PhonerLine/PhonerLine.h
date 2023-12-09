@@ -16,7 +16,6 @@ namespace PhonerLine {
 class PhonerLine
 {
 private:
-	/* чтобы понимать в каком состоянии мы находимся сейчас */
 	PhonerLineContext fsm_;
 	Timer timer_;
 
@@ -39,6 +38,7 @@ public:
 	void onHook();
 	void validNumber();
 	void invalidNumber();
+	void tick();
 	/* and implicit timeout event */
 
 	/* methods-reactions */
@@ -49,32 +49,38 @@ public:
 	void playMessage();
 	void findConnection();
 	void continues();
-	void finish_tick();
+	void finish_tick(const unsigned int ticks_by_fact);
 
-	/* запускает таймер с задачей - прождать 3 секунды, может прерваться внешним событием */
+	/* starts a timer with task. Timeout 3 seconds. If interrupted received - stops run task slowly */
 	void startTimer(PhonerLineContext & context);
-	/* останавливает таймер и очищает задание, возвращая при этом количество тиков по факту */
+	/* stops a timer with task, cleans data about task running too */
 	int stopTimer();
 
-	/* методы-помощник, отдающий состояние таймера */
+	/* helpers-methods, that gives timer or timerTask actual state */
 	const bool getTimerTaskState()
 	{
 		return timer_.getTimerTaskState();
 	}
-
 	const unsigned int ticksByFact()
 	{
 		return timer_.ticksByFact();
 	}
-
+	const bool checkRunningStateTimer()
+	{
+		return timer_.checkRunningStateTimer();
+	}
+	bool & TaskState()
+	{
+		return timer_.TaskState();
+	}
 	bool & stopped()
 	{
 		return timer_.needStop();
 	}
 
-	const bool & checkTaskState()
+	void reloadTimerTask()
 	{
-		return timer_.checkTaskState();
+		return timer_.reloadTimerTask();
 	}
 };
 

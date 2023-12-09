@@ -1,32 +1,38 @@
 #include "PhonerLine.h"
 
-
-int main(int argc, char * argv[])
+int main()
 {
-	PhonerLine::PhonerLine obj;
+	PhonerLine::PhonerLine phonerLine_;
 
-	std::cout << "Start state: " << obj.getContext().getState().getName() << std::endl;
+	std::cout << "Start state: " << phonerLine_.getContext().getState().getName() << std::endl;
 
-	obj.offHook(); std::cout << "offHook/" << obj.response() << std::endl;
+	phonerLine_.offHook(); std::cout << "offHook/" << phonerLine_.response() << std::endl;
 	// WE ARE IN `READY` STATE ALREADY.
-	obj.offHook(); std::cout << "offHook/" << obj.response() << std::endl;
+	phonerLine_.offHook(); std::cout << "offHook/" << phonerLine_.response() << std::endl;
 	// WE ARE IN `READY` STATE ALREADY
-	// obj.stopped() = true;
-	// obj.validNumber(); std::cout << "validNumber/" << obj.response() << std::endl;
 
-	sleep(1);
-	const bool & waitingTaskFinished = obj.checkTaskState();
-	while (not waitingTaskFinished and not obj.stopped())
+	const bool & waitingTaskFinished = phonerLine_.TaskState();
+	while (not waitingTaskFinished)
 	{
-		std::cout << "Task for ticking is running, waiting..." << std::endl;
-		// obj.stopped() = true;
+		if (phonerLine_.ticksByFact() == 2)
+		{
+			phonerLine_.validNumber();
+		}
+		else
+		{
+			phonerLine_.tick();
+			// std::cout << "Responce for tick: " << phonerLine_.response() << std::endl;
+		}
 	}
+	std::cout << "Responce after timeout: " << phonerLine_.response() << std::endl;
 
-	// If timer isn't running, then it was very strange value...
-	unsigned int rv = obj.ticksByFact();
-	std::cout << "ticksByFact = " << rv << std::endl;
+	std::cout << "Current state 1: " << phonerLine_.getContext().getState().getName() << std::endl;
+	phonerLine_.validNumber(); std::cout << "validNumber/" << phonerLine_.response() << std::endl;
 
-	std::cout << "Current state: " << obj.getContext().getState().getName() << std::endl;
-		
+	std::cout << "Current state 2: " << phonerLine_.getContext().getState().getName() << std::endl;
+	phonerLine_.onHook(); std::cout << "onHook/" << phonerLine_.response() << std::endl;
+
+	std::cout << "Current state 3: " << phonerLine_.getContext().getState().getName() << std::endl;
+	
 	return EXIT_SUCCESS;
 }

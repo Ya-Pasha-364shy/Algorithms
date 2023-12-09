@@ -1,0 +1,100 @@
+onHook/nul onHook/nul
+onHook/nul validNumber/nul
+onHook/nul I/I validNumber/nul
+onHook/nul I/I I/I validNumber/nul
+offHook/soundDialTone onHook/disconnectedLine onHook/nul
+offHook/soundDialTone onHook/disconnectedLine validNumber/nul
+offHook/soundDialTone onHook/disconnectedLine I/I validNumber/nul
+offHook/soundDialTone onHook/disconnectedLine I/I I/I validNumber/nul
+offHook/soundDialTone offHook/nul onHook/disconnectedLine
+offHook/soundDialTone offHook/nul validNumber/findConnection
+offHook/soundDialTone offHook/nul I/I validNumber/findConnection
+offHook/soundDialTone offHook/nul I/I I/I validNumber/findConnection
+offHook/soundDialTone validNumber/findConnection onHook/disconnectedLine onHook/nul
+offHook/soundDialTone validNumber/findConnection onHook/disconnectedLine validNumber/nul
+offHook/soundDialTone validNumber/findConnection onHook/disconnectedLine I/I validNumber/nul
+offHook/soundDialTone validNumber/findConnection onHook/disconnectedLine I/I I/I validNumber/nul
+offHook/soundDialTone validNumber/findConnection offHook/nul onHook/disconnectedLine
+offHook/soundDialTone validNumber/findConnection offHook/nul validNumber/continues
+offHook/soundDialTone validNumber/findConnection offHook/nul I/I validNumber/continues
+offHook/soundDialTone validNumber/findConnection offHook/nul I/I I/I validNumber/continues
+offHook/soundDialTone validNumber/findConnection validNumber/continues onHook/disconnectedLine
+offHook/soundDialTone validNumber/findConnection validNumber/continues validNumber/continues
+offHook/soundDialTone validNumber/findConnection validNumber/continues I/I validNumber/continues
+offHook/soundDialTone validNumber/findConnection validNumber/continues I/I I/I validNumber/continues
+offHook/soundDialTone validNumber/findConnection invalidNumber/continues onHook/disconnectedLine
+offHook/soundDialTone validNumber/findConnection invalidNumber/continues validNumber/continues
+offHook/soundDialTone validNumber/findConnection invalidNumber/continues I/I validNumber/continues
+offHook/soundDialTone validNumber/findConnection invalidNumber/continues I/I I/I validNumber/continues
+offHook/soundDialTone validNumber/findConnection I/I onHook/disconnectedLine
+offHook/soundDialTone validNumber/findConnection I/I validNumber/continues
+offHook/soundDialTone validNumber/findConnection I/I I/I validNumber/continues
+offHook/soundDialTone validNumber/findConnection I/I I/I I/I validNumber/continues
+offHook/soundDialTone invalidNumber/playMessage onHook/disconnectedLine onHook/nul
+offHook/soundDialTone invalidNumber/playMessage onHook/disconnectedLine validNumber/nul
+offHook/soundDialTone invalidNumber/playMessage onHook/disconnectedLine I/I validNumber/nul
+offHook/soundDialTone invalidNumber/playMessage onHook/disconnectedLine I/I I/I validNumber/nul
+offHook/soundDialTone invalidNumber/playMessage offHook/nul onHook/disconnectedLine
+offHook/soundDialTone invalidNumber/playMessage offHook/nul validNumber/slowBusyTone
+offHook/soundDialTone invalidNumber/playMessage offHook/nul I/I validNumber/slowBusyTone
+offHook/soundDialTone invalidNumber/playMessage offHook/nul I/I I/I validNumber/slowBusyTone
+offHook/soundDialTone invalidNumber/playMessage validNumber/slowBusyTone onHook/disconnectedLine
+offHook/soundDialTone invalidNumber/playMessage validNumber/slowBusyTone validNumber/slowBusyTone
+offHook/soundDialTone invalidNumber/playMessage validNumber/slowBusyTone I/I validNumber/slowBusyTone
+offHook/soundDialTone invalidNumber/playMessage validNumber/slowBusyTone I/I I/I validNumber/slowBusyTone
+offHook/soundDialTone invalidNumber/playMessage invalidNumber/slowBusyTone onHook/disconnectedLine
+offHook/soundDialTone invalidNumber/playMessage invalidNumber/slowBusyTone validNumber/slowBusyTone
+offHook/soundDialTone invalidNumber/playMessage invalidNumber/slowBusyTone I/I validNumber/slowBusyTone
+offHook/soundDialTone invalidNumber/playMessage invalidNumber/slowBusyTone I/I I/I validNumber/slowBusyTone
+offHook/soundDialTone invalidNumber/playMessage I/I onHook/disconnectedLine
+offHook/soundDialTone invalidNumber/playMessage I/I validNumber/slowBusyTone
+offHook/soundDialTone invalidNumber/playMessage I/I I/I validNumber/slowBusyTone
+offHook/soundDialTone invalidNumber/playMessage I/I I/I I/I validNumber/slowBusyTone
+offHook/soundDialTone I/I onHook/disconnectedLine onHook/nul
+offHook/soundDialTone I/I onHook/disconnectedLine validNumber/nul
+offHook/soundDialTone I/I onHook/disconnectedLine I/I validNumber/nul
+offHook/soundDialTone I/I onHook/disconnectedLine I/I I/I validNumber/nul
+offHook/soundDialTone I/I offHook/nul onHook/disconnectedLine
+offHook/soundDialTone I/I offHook/nul validNumber/findConnection
+offHook/soundDialTone I/I offHook/nul I/I validNumber/findConnection
+offHook/soundDialTone I/I offHook/nul I/I I/I validNumber/slowBusyTone
+offHook/soundDialTone I/I validNumber/findConnection onHook/disconnectedLine
+offHook/soundDialTone I/I validNumber/findConnection validNumber/continues
+offHook/soundDialTone I/I validNumber/findConnection I/I validNumber/continues
+offHook/soundDialTone I/I validNumber/findConnection I/I I/I validNumber/continues
+offHook/soundDialTone I/I invalidNumber/playMessage onHook/disconnectedLine
+offHook/soundDialTone I/I invalidNumber/playMessage validNumber/slowBusyTone
+offHook/soundDialTone I/I invalidNumber/playMessage I/I validNumber/slowBusyTone
+offHook/soundDialTone I/I invalidNumber/playMessage I/I I/I validNumber/slowBusyTone
+offHook/soundDialTone I/I I/I onHook/disconnectedLine onHook/nul
+offHook/soundDialTone I/I I/I onHook/disconnectedLine validNumber/nul
+offHook/soundDialTone I/I I/I onHook/disconnectedLine I/I validNumber/nul
+offHook/soundDialTone I/I I/I onHook/disconnectedLine I/I I/I validNumber/nul
+offHook/soundDialTone I/I I/I offHook/nul onHook/disconnectedLine
+offHook/soundDialTone I/I I/I offHook/nul validNumber/findConnection
+offHook/soundDialTone I/I I/I offHook/nul I/I validNumber/slowBusyTone
+offHook/soundDialTone I/I I/I offHook/nul I/I I/I validNumber/slowBusyTone
+offHook/soundDialTone I/I I/I validNumber/findConnection onHook/disconnectedLine
+offHook/soundDialTone I/I I/I validNumber/findConnection validNumber/continues
+offHook/soundDialTone I/I I/I validNumber/findConnection I/I validNumber/continues
+offHook/soundDialTone I/I I/I validNumber/findConnection I/I I/I validNumber/continues
+offHook/soundDialTone I/I I/I invalidNumber/playMessage onHook/disconnectedLine
+offHook/soundDialTone I/I I/I invalidNumber/playMessage validNumber/slowBusyTone
+offHook/soundDialTone I/I I/I invalidNumber/playMessage I/I validNumber/slowBusyTone
+offHook/soundDialTone I/I I/I invalidNumber/playMessage I/I I/I validNumber/slowBusyTone
+offHook/soundDialTone I/I I/I I/I onHook/disconnectedLine
+offHook/soundDialTone I/I I/I I/I validNumber/slowBusyTone
+offHook/soundDialTone I/I I/I I/I I/I validNumber/slowBusyTone
+offHook/soundDialTone I/I I/I I/I I/I I/I validNumber/slowBusyTone
+validNumber/nul onHook/nul
+validNumber/nul validNumber/nul
+validNumber/nul I/I validNumber/nul
+validNumber/nul I/I I/I validNumber/nul
+invalidNumber/nul onHook/nul
+invalidNumber/nul validNumber/nul
+invalidNumber/nul I/I validNumber/nul
+invalidNumber/nul I/I I/I validNumber/nul
+I/I onHook/nul
+I/I validNumber/nul
+I/I I/I validNumber/nul
+I/I I/I I/I validNumber/nul

@@ -55,7 +55,7 @@ public:
 		return timerSecond_;
 	}
 
-	bool & checkTaskState()
+	const bool timerTaskState()
 	{
 		return taskIsRunning_;
 	}

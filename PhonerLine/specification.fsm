@@ -1,0 +1,36 @@
+F 0
+s 6 Idle Conversation Warning Ready Ready_1 Ready_2
+i 5 onHook offHook validNumber invalidNumber I
+o 8 soundDialTone disconnectedLine slowBusyTone playMessage findConnection continues nul I
+n0 Idle
+p 30
+Idle onHook Idle nul
+Idle offHook Ready soundDialTone
+Idle validNumber Idle nul
+Idle invalidNumber Idle nul
+Idle I Idle I
+Conversation onHook Idle disconnectedLine
+Conversation offHook Conversation nul
+Conversation validNumber Conversation continues
+Conversation invalidNumber Conversation continues
+Conversation I Conversation I
+Warning onHook Idle disconnectedLine
+Warning offHook Warning nul
+Warning validNumber Warning slowBusyTone
+Warning invalidNumber Warning slowBusyTone
+Warning I Warning I
+Ready onHook Idle disconnectedLine
+Ready offHook Ready nul
+Ready validNumber Conversation findConnection
+Ready invalidNumber Warning playMessage
+Ready I Ready_1 I
+Ready_1 onHook Idle disconnectedLine
+Ready_1 offHook Ready_1 nul
+Ready_1 validNumber Conversation findConnection
+Ready_1 invalidNumber Warning playMessage
+Ready_1 I Ready_2 I
+Ready_2 onHook Idle disconnectedLine
+Ready_2 offHook Ready_2 nul
+Ready_2 validNumber Conversation findConnection
+Ready_2 invalidNumber Warning playMessage
+Ready_2 I Warning I
