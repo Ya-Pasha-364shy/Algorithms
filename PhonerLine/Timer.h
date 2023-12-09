@@ -18,16 +18,21 @@ public:
 	Timer() : taskFullyCompleted_(false)
 	{
 		timerTask_ = new TimerTask(TIMERTASK_TIMEOUT_3_SEC);
-	};
+	}
 
 	const bool getTimerTaskState()
 	{
 		return timerTask_->getTaskState();
 	}
 
-	const bool & checkTaskState()
+	bool & TaskState()
 	{
 		return taskFullyCompleted_;
+	}
+
+	const bool checkRunningStateTimer()
+	{
+		return timerTask_->timerTaskState();
 	}
 
 	bool & needStop()
@@ -40,11 +45,23 @@ public:
 		return timerTask_->ticksByFact();
 	}
 
+	/* must be called if task isn't running rigth now */
+	void reloadTimerTask()
+	{
+		delete timerTask_;
+		timerTask_ = new TimerTask(TIMERTASK_TIMEOUT_3_SEC);
+	}
+
 	void startTimer(PhonerLineContext & context);
-	/* останавливает таймер, возвращая количество тиков по факту */
+
+	/* stops the timer, returns number of "ticks" by fact */
 	int stopTimer();
 
-	~Timer() {}
+	~Timer()
+	{
+		if (timerTask_ != nullptr)
+			delete timerTask_;
+	}
 };
 
 } // namespace PhonerLine

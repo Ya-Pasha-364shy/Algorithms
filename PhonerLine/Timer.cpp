@@ -14,13 +14,15 @@ void Timer::startTimer(PhonerLineContext & context)
 			timerTask_->timerTaskRun();
 		});
 		background_loader.join();
-		if (timerTask_->getTaskState())
+
+		if (timerTask_->getTaskState() == true) // If task is ready
 		{
 			/* if timer is fully completed, then change state to `Warning` */
-			context.getOwner().finish_tick();
 			context.setState(PhonerLineFSM::Warning);
 		}
+		context.getOwner().finish_tick(ticksByFact());
 		taskFullyCompleted_ = true;
+
 	});
 	parent_background_load.detach();
 }
@@ -29,12 +31,16 @@ int Timer::stopTimer()
 {
 	int rv = -1;
 	
-	if (timerTask_)
+	if (timerTask_ != nullptr)
 	{
 		timerTask_->needStop() = true;
 		rv = timerTask_->ticksByFact();
 
+		/* sync with thread, that runs or stops a task */
+		while (not taskFullyCompleted_);
+
 		delete timerTask_;
+		timerTask_ = nullptr;
 	}
 
 	return rv;

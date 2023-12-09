@@ -38,7 +38,7 @@ public:
 	: State(name, stateId) {};
 
 	virtual void Entry(PhonerLineContext &) {};
-	virtual bool Exit(PhonerLineContext  &) { return true; };
+	virtual int Exit(PhonerLineContext  &) { return true; };
 
 	virtual void ReceiveStimulusAndDoTransition(PhonerLineContext &) {};
 
@@ -79,7 +79,7 @@ public:
 	: PhonerLineFSM_Default(name, stateId) {};
 
 	void Entry(PhonerLineContext &) override;
-	bool Exit(PhonerLineContext  &) override;
+	int Exit(PhonerLineContext  &) override;
 
 	void ReceiveStimulusAndDoTransition(PhonerLineContext &) override;
 };
