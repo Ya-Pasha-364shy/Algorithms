@@ -46,9 +46,7 @@ proctype moving()
 {
 	int inverse_boy_idx;
 	do
-	:: CHILDREN_SWIM_ACROSS_RIVER() ->
-	   CHILD_MAKE_CHOICE_AND_ACROSS_BACK() ->
-	   SOLDIER_SWIM_ACROSS_RIVER() ->
+	:: CHILDREN_SWIM_ACROSS_RIVER(); CHILD_MAKE_CHOICE_AND_ACROSS_BACK(); SOLDIER_SWIM_ACROSS_RIVER();
 	   inverse_boy_idx = 1 - CHOICE
 	:: if
 	   :: nempty(SOLDIERS) && (CHOICE != PREV_CHOICE)    -> IF_TRANSITION: RETURN_BOAT_FOR_SOILDERS_BY_BOY(inverse_boy_idx)
