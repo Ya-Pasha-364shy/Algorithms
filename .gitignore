@@ -14,7 +14,7 @@
 /.ijwb/
 /.project
 /.settings
-/.vscode/
+**/.vscode/
 .eclipse/
 .settings/
 .classpath
