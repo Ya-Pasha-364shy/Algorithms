@@ -35,8 +35,8 @@ void listRemoveNodeByIndex(list_t list, size_t index);
 
 /* algorithms for linked list */
 
-void listSort(list_t list);
 void listPrint(list_t list);
+list_t listSort(list_t list);
 void listReverseByPayloads(list_t list);
 int listBsearch(list_t list, int number);
 
@@ -78,8 +78,8 @@ typedef list_s* list_t;
 #define FOREACH_NODE_FROM_END(i, list) \
   i = 0; \
   for (list_node_t node = list->last_node; \
-    i < list->length; \
-    ++i, node = node->prev)
+       i < list->length; \
+       ++i, node = node->prev)
 
 #define FOREACH_NODE_FROM_END_WITHOUT_TRANSITION(i, list) \
   i = list->length; \
@@ -89,7 +89,7 @@ typedef list_s* list_t;
 #define FOREACH_NODE_FROM_BEGIN(i, list) \
   i = 0; \
   for (list_node_t node = list->first_node; \
-    i < list->length; \
-    ++i, node = node->next)
+       i < list->length; \
+       ++i, node = node->next)
 
 #endif // LIST_LIBRARY_H
