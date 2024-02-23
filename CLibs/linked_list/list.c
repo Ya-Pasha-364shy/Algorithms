@@ -1,7 +1,5 @@
 #include <time.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <malloc.h>
 
 #include "list.h"
 
@@ -12,38 +10,61 @@ static void setToDefaultsNode(list_node_t node) {
 }
 
 // to avoid memory collisions
-static bool thisNodeAlreadyExistsByMemory(
-  list_node_t node,
-  list_t list) {
+static bool thisNodeAlreadyExistsByMemory(list_node_t node, list_t list) {
   list_node_t iterator = list->first_node; 
   for (int i = 0; i < list->length; i++) {
-    if (iterator == node)
+    if (iterator == node) {
       return true;
-
+    }
     iterator = iterator->next;
   }
   return false;
 }
 
 static list_node_t getNodeByIndex(list_t list, size_t index) {
-  size_t i = 0;
-  FOREACH_NODE_FROM_BEGIN(i, list) {
-    if (i == index) {
+  size_t iterator;
+  FOREACH_NODE_FROM_BEGIN(iterator, list) {
+    if (iterator == index) {
       return node;
     }
   }
   return NULL;
 }
 
+static list_node_t TEST_FUNCTION createRandomNode() {
+  list_node_t node = calloc(1, sizeof(list_node_s));
+  if (!node) {
+    return NULL;
+  }
+  node->payload = rand() % 100;
+  return node;
+}
+
 static list_node_t createCopyOfNode(list_node_t source_node) {
   list_node_t destination_node = calloc(1, sizeof(list_node_s));
+  if (!destination_node) {
+    return NULL;
+  }
   destination_node->payload = source_node->payload;
   return destination_node;
 }
 
-static bool lessThanPivot(const list_node_t pivot_obj,
+static list_t createCopyOfListByMoving(list_t source_list) {
+  size_t iterator;
+  list_t copy_list = List(0, false);
+
+  FOREACH_NODE_FROM_BEGIN(iterator, source_list) {
+    list_node_t copyed_node = createCopyOfNode(node);
+    copy_list->listInsertAtEnd(copy_list, copyed_node);
+  }
+  source_list->listRemove(source_list);
+
+  return copy_list;
+}
+
+static bool lessOrEqualThanPivot(const list_node_t pivot_obj,
                           const list_node_t current_obj) {
-  return current_obj->payload < pivot_obj->payload; 
+  return current_obj->payload <= pivot_obj->payload; 
 }
 
 static bool greaterThanPivot(const list_node_t pivot_obj,
@@ -56,11 +77,31 @@ typedef bool (*comparatorWithPivot)(list_node_t, list_node_t);
 static list_t createListByCondition(const list_t list, list_node_t pivot_node,
                                     comparatorWithPivot cmp) {
   size_t iterator;
-  list_t selected_list = List(0);
-  FOREACH_NODE_FROM_BEGIN(iterator, list) {
-    if (cmp(pivot_node, node)) {
-      list_node_t copyed_node = createCopyOfNode(node);
-      selected_list->listInsertAtEnd(selected_list, copyed_node);
+  list_t selected_list = List(0, false);
+
+  if (cmp == lessOrEqualThanPivot) {
+    unsigned int pivot_duplicates = 0;
+
+    FOREACH_NODE_FROM_BEGIN(iterator, list) {  
+      if (node->payload == pivot_node->payload) {
+        ++pivot_duplicates;
+      }
+    }
+    FOREACH_NODE_FROM_BEGIN(iterator, list) {
+      if (cmp(pivot_node, node)) {
+        if (pivot_node->payload == node->payload && (--pivot_duplicates == 0)) {
+            continue;
+        }
+        list_node_t copyed_node = createCopyOfNode(node);
+        selected_list->listInsertAtEnd(selected_list, copyed_node);
+      }
+    }
+  } else if (cmp == greaterThanPivot) {
+    FOREACH_NODE_FROM_BEGIN(iterator, list) {
+      if (cmp(pivot_node, node)) {
+        list_node_t copyed_node = createCopyOfNode(node);
+        selected_list->listInsertAtEnd(selected_list, copyed_node);
+      }
     }
   }
   if (selected_list->length == 0) {
@@ -70,10 +111,58 @@ static list_t createListByCondition(const list_t list, list_node_t pivot_node,
   return selected_list;
 }
 
-static list_t mergeLists(list_t const less_than_pivot_list,
-                         list_node_t const pivot_node,
-                         list_t const greater_than_pivot_list) {
-  
+static list_t mergeLists(list_t less_than_pivot_list,
+                         list_node_t pivot_node,
+                         list_t greater_than_pivot_list) {
+  if (less_than_pivot_list != NULL &&
+      greater_than_pivot_list != NULL) {
+    // prepare pivot_node
+    pivot_node->prev = less_than_pivot_list->last_node;
+    pivot_node->next = greater_than_pivot_list->first_node;
+    // change pointers on "base pivot_list"
+    less_than_pivot_list->last_node->next = pivot_node;
+    less_than_pivot_list->last_node = pivot_node;
+    // binding another list to "base list" (already with pivot)
+    greater_than_pivot_list->first_node->prev = less_than_pivot_list->last_node;
+    greater_than_pivot_list->last_node->next = less_than_pivot_list->first_node;
+    less_than_pivot_list->first_node->prev = greater_than_pivot_list->last_node;
+
+    /* "+1" -- it's "pivot" element */
+    less_than_pivot_list->length += greater_than_pivot_list->length + 1;
+
+    return createCopyOfListByMoving(less_than_pivot_list);
+  } else if (less_than_pivot_list != NULL &&
+             greater_than_pivot_list == NULL) {
+    // prepare pivot_node
+    pivot_node->prev = less_than_pivot_list->last_node;
+    pivot_node->next = less_than_pivot_list->first_node;
+    // change pointers on "base pivot_list"
+    less_than_pivot_list->last_node->next = pivot_node;
+    less_than_pivot_list->last_node = pivot_node;
+    less_than_pivot_list->first_node->prev = pivot_node;
+
+    less_than_pivot_list->length++;
+
+    return createCopyOfListByMoving(less_than_pivot_list);
+  } else if (less_than_pivot_list == NULL &&
+             greater_than_pivot_list != NULL) {
+    // prepare pivot node
+    pivot_node->prev = greater_than_pivot_list->last_node;
+    pivot_node->next = greater_than_pivot_list->first_node;
+    // change pointers on "base pivot list"
+    greater_than_pivot_list->first_node->prev = pivot_node;
+    greater_than_pivot_list->first_node = pivot_node;
+    greater_than_pivot_list->last_node->next = pivot_node;
+
+    greater_than_pivot_list->length++;
+
+    return createCopyOfListByMoving(greater_than_pivot_list);
+  } else {
+    // an impossible case if called recursively
+    // from the listSort function.
+    // However, let’s handle it just in case.
+    return NULL;
+  }
 }
 
 void listRemove(list_t list) {
@@ -91,38 +180,42 @@ void listRemove(list_t list) {
   free(list);
 }
 
-list_t listInit(size_t size) {
-  list_t list = malloc(sizeof(list_s));
+list_t listInit(size_t size, bool make_random_values) {
+  list_t list = calloc(1, sizeof(list_s));
   if (!list) {
     return NULL;
   }
+  list->length = size;
   if (!size) {
-    list->length = 0;
-    list->last_node = NULL;
-    list->first_node = NULL;
     return list;
   }
 
-  list->length = size;
   list->first_node = malloc(sizeof(list_node_s));
   if (!list->first_node) {
     return NULL;
   }
 
   setToDefaultsNode(list->first_node);  
-  // для тестовых целей
   srand(time(NULL));
-  list->first_node->payload = rand() % 100;
+  if (make_random_values) {
+    list->first_node->payload = rand() % 100;
+  } else {
+    list->first_node->payload = 0;
+  }
+
   list_node_t cursor_on_previous = list->first_node;
 
   for (size_t i = 1; i < size; i++) {
     list_node_t tmp = malloc(sizeof(list_node_s));
     setToDefaultsNode(tmp);
 
-    tmp->prev = cursor_on_previous;
-    tmp->payload = rand() % 100;
     cursor_on_previous->next = tmp;
-
+    tmp->prev = cursor_on_previous;
+    if (make_random_values) {
+      tmp->payload = rand() % 100;  
+    } else {
+      tmp->payload = 0;
+    }
     cursor_on_previous = tmp;
   }
   list->last_node = cursor_on_previous;
@@ -262,38 +355,37 @@ void listRemoveNodeByIndex(list_t list, size_t index) {
 
 /* algorithms for linked list */
 
-void listPrint(list_t list) {
+void listPrint(const char* name, list_t list) {
   if (!list) {
     return;
   }
-  printf("[ ");
+  printf("%s = [ ", name);
   list_node_t iterator = list->first_node;
   for (size_t i = 0; i < list->length; i++) {
-    printf("%p: %d; ", iterator, iterator->payload);
+    printf(" %d ", iterator->payload);
     iterator = iterator->next;
   }
   printf(" ]\n");
 }
 
 list_t listSort(list_t list) {
+  if (list == NULL) {
+    return NULL;
+  }
   if (list->length == 1) {
     return list;
   }
 
+  // O(n) (на самом деле здесь пока что O(n^2))
+  // TODO(K1rch): change O(n^2) on simple O(n)
   list_node_t pivot_node =
                   getNodeByIndex(list, list->length / 2);
-  list_t less_pivot = createListByCondition(list, pivot_node,
-                                            &lessThanPivot);
   list_t greater_pivot = createListByCondition(list, pivot_node,
                                                &greaterThanPivot);
-  listPrint(less_pivot);
-  printf("pivot payload = %d\n", pivot_node->payload);
-  listPrint(greater_pivot);
-  // TODO(k1rch): merge lists with free(less_pivot) or listSort(greater_pivot)
-  //              depending on lenght of lists. Удалить сами списки, а элементы
-  //              элегантно перенести в новый список. Этот перенос можно сделать за O(1),
-  //              просто поменяв указатели последнего элемента левого списка или 
-  //              первого элемента правого.
+  list_t less_pivot = createListByCondition(list, pivot_node,
+                                            &lessOrEqualThanPivot);
+  // O(log(n)), но если на каждой итерации будет выбираться самый бОльший
+  // или самый меньший pivot, то тогда будет O(n)
   return mergeLists(listSort(less_pivot), pivot_node, listSort(greater_pivot));
 }
 
@@ -330,8 +422,8 @@ int listBsearch(list_t list, int number) {
 }
 */
 
-list_t List(size_t nmemb) {
-  list_t this = listInit(nmemb);
+list_t List(size_t nmemb, bool make_random_values) {
+  list_t this = listInit(nmemb, make_random_values);
 
   this->listRemove = &listRemove;
 
@@ -339,31 +431,44 @@ list_t List(size_t nmemb) {
   this->listInsertAtEnd = &listInsertAtEnd;
   this->listInsertAtBegin = &listInsertAtBegin;
 
-  this->listSort = &listSort;
+  // this->listSort = &listSort;
   this->listErase = &listErase;
 
   return this;
 }
 
 int main(void) {
-  size_t nmemb;
-  printf("Get lenght of list: "); scanf("%ld", &nmemb);
+  // size_t nmemb;
+  // printf("Get lenght of list: "); scanf("%ld", &nmemb);
 
-  // для теста при создании списка будет инициализировать случайные числа 
-  list_t lst = List(nmemb);
+  list_t lst = init(3, 1, 2, 3);
 
   if (lst == NULL)
     return EXIT_SUCCESS;
 
-  size_t i;
-  FOREACH_NODE_FROM_BEGIN(i, lst) {
-    printf("%d \n", node->payload);
-  }
-  printf("\n\n");
+  list_node_t node1 = createRandomNode();
+  list_node_t node2 = createRandomNode();
+  list_node_t node3 = createRandomNode();
 
-  lst->listSort(lst);
+  lst->listInsertAtBegin(lst, node1);
+  lst->listInsertAtBegin(lst, node2);
+  lst->listInsertAtBegin(lst, node3);
+
+  lst = listSort(lst);
+  // listPrint("sorted", sorted);
+
+  printf("====\n");
+  size_t iterator;
+  FOREACH_NODE_FROM_BEGIN(iterator, lst) {
+    printf("payload = %d\n", node->payload);
+  }
+  printf("====\n");
+  FOREACH_NODE_FROM_END(iterator, lst) {
+    printf("payload = %d\n", node->payload);
+  }
+  printf("====\n");
 
   lst->listRemove(lst);
 
   return EXIT_SUCCESS;  
-} 
+}
