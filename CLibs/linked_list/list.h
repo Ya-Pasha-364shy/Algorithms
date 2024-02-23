@@ -2,7 +2,16 @@
 #define LIST_LIBRARY_H
 
 #include <stdlib.h>
+#include <stdarg.h>
+#include <malloc.h>
 #include <stdbool.h>
+
+/**
+ * @brief
+ * директива для пометок функций
+ * для теста.
+*/
+#define TEST_FUNCTION
 
 /** @brief
  * Список обладает быстрой вставкой
@@ -22,27 +31,136 @@ typedef struct list_node* list_node_t;
 
 /* operations with memory */
 
+/**
+ * @brief
+ * Функция или метод, удаляющий список.
+ * @param `list` объект типа `list_t`, если играет роль метода,
+ * то должен быть таким же, что и вызывающий объект.
+*/
 void listRemove(list_t list);
-list_t listInit(size_t lst_size);
 
+/**
+ * @brief
+ * Функция, инициализирующая новый список.
+ * @param `nmemb` - количество элементов списка.
+ * @param `make_random_values` задаёт режим присвоения значений
+ * объектам списка. Если `false` - каждое значение иницилизируется нулём.
+ * @return
+ * Возвращает список объектов.
+ * Гарантирует, что у каждого объекта имеется связность степени 2
+*/
+list_t listInit(size_t nmemb, bool make_random_values);
+
+/**
+ * @brief
+ * Функция или метод, вставляющий указанный элемент в конец списка.
+ * @param `list` объект типа `list_t`, если играет роль метода,
+ * то должен быть таким же, что и вызывающий объект.
+ * @param `node` объект, который необходимо вставить в конец
+ * дву-связного списка.
+*/
 void listInsertAtEnd(list_t list, list_node_t node);
-void listInsertAtBegin(list_t list, list_node_t node);
-void listInsert(list_t list,  list_node_t node, size_t idx);
 
+/**
+ * @brief
+ * Функция или метод, вставляющий указанный элемент в начало списка.
+ * @param `list` объект типа `list_t`, если играет роль метода,
+ * то должен быть таким же, что и вызывающий объект.
+ * @param `node` объект, который необходимо вставить в начало
+ * дву-связного списка.
+*/
+void listInsertAtBegin(list_t list, list_node_t node);
+
+/**
+ * @brief
+ * Функция, вставляющая указанный элемент по указанному индексу в список.
+ * @param `list` объект типа `list_t`, если играет роль метода,
+ * то должен быть таким же, что и вызывающий объект.
+ * @param `node` объект, который необходимо вставить в список.
+ * @param `idx` индекс, по которому будет произведена вставка `node`.
+*/
+void listInsert(list_t list, list_node_t node, size_t idx);
+
+/**
+ * @brief
+ * Функция или метод, очищающая значения списка, зануляя каждый элемент.
+ * @param `list` объект типа `list_t`, если играет роль метода,
+ * то должен быть таким же, что и вызывающий объект.
+*/
 void listErase(list_t list); 
+
+/**
+ * @brief
+ * Функция, удяляющая (высвобождающая память) элементы из списка.
+ * @param `list` объект типа `list_t`, если играет роль метода,
+ * то должен быть таким же, что и вызывающий объект.
+*/
 void listRemoveAllNodes(list_t list);
+
+/**
+ * @brief
+ * Функция, удяляющая (высвобождающая память) элемент из списка
+ * по указанному индексу.
+ * @param `list` объект типа `list_t`, если играет роль метода,
+ * то должен быть таким же, что и вызывающий объект.
+ * @param `index` индекс элемента списка, что необходимо удалить
+ * @result
+ * Гарантирует, что связи между объектами, окружающими удалённый
+ * элемент, будут переопределны должным образом.
+*/
 void listRemoveNodeByIndex(list_t list, size_t index);
 
 /* algorithms for linked list */
 
-void listPrint(list_t list);
+/**
+ * @brief
+ * Функция, печатающая все элементы списка
+ * @param `name` имя списка.
+ * @param `list` объект типа `list_t`, если играет роль метода,
+ * то должен быть таким же, что и вызывающий объект.
+*/
+void listPrint(const char* name, list_t list);
+
+/**
+ * @brief
+ * Функция, производящая быструю сортировку 
+ * в среднем случае за O(n*log(n)) (худший O(n^2)),
+ * посредством рекурсии.
+ * @param `list` объект типа `list_t`, если играет роль метода,
+ * то должен быть таким же, что и вызывающий объект.
+ * @return
+ * Возвращает указатель на отсортированный список.
+ * Гарантирует, что исходный список будет удалён (его память высвобождена).
+*/
 list_t listSort(list_t list);
+
+/**
+ * @brief
+ * Функция, разворачивающая список по значениям
+ * (без перемещения сегментов памяти !)
+ * @param `list` объект типа `list_t`, если играет роль метода,
+ * то должен быть таким же, что и вызывающий объект.
+*/
 void listReverseByPayloads(list_t list);
-int listBsearch(list_t list, int number);
+
+// TODO(k1rch): реализовать
+// int listBsearch(list_t list, int number);
 
 /* Calls for initialize a two-way list */
 
-list_t List(size_t nmemb);
+/**
+ * @brief
+ * Конструктор объектов типа list_t. Выделяет динамическую
+ * память в куче для создания объектов списка.
+ * @param `nmemb` число объектов списка.
+ * @param `make_random_values` задаёт режим присвоения значений
+ * объектам списка. Если `false` - каждое значение иницилизируется нулём.
+ * @return
+ * Возвращает созданный список с числом элементов `nmemb`.
+ * Гарантирует, что каждый объект этого списка имеет
+ * двух-сторонюю связность.
+*/
+list_t List(size_t nmemb, bool make_random_values);
 
 /* defining of list and list_node by structs */
 
@@ -67,7 +185,7 @@ typedef struct list {
   void (*listInsertAtBegin)(struct list* list, list_node_t node);
   void (*listInsert)(struct list* list, list_node_t node, size_t idx);
 
-  void (*listSort)(struct list* list);
+  // struct list* (*listSort)(struct list* list);
   void (*listErase)(struct list* list);
 } list_s;
 
@@ -75,21 +193,63 @@ typedef list_s* list_t;
 
 /* Macroses foreach */
 
+/**
+ * @brief
+ * Цикл foreach, начинающий обход списка с конца
+ * @param `i` счётчик, нужен для того, чтобы
+ * остановиться на первом элементе и случайно
+ * не сделать полный цикл (начать итерироваться
+ * с конца снова).
+ * @param `list` список элементов.
+*/
 #define FOREACH_NODE_FROM_END(i, list) \
   i = 0; \
   for (list_node_t node = list->last_node; \
        i < list->length; \
        ++i, node = node->prev)
 
-#define FOREACH_NODE_FROM_END_WITHOUT_TRANSITION(i, list) \
-  i = list->length; \
-  for (list_node_t node = list->last_node; \
-       i > 0; --i)
-
+/**
+ * @brief
+ * Цикл foreach, начинающий обход списка с начала
+ * @param `i` счётчик, нужен для того, чтобы
+ * остановиться на последнем элементе и случайно
+ * не сделать полный цикл (начать итерироваться
+ * с начала снова).
+ * @param `list` список элементов.
+*/
 #define FOREACH_NODE_FROM_BEGIN(i, list) \
   i = 0; \
   for (list_node_t node = list->first_node; \
        i < list->length; \
        ++i, node = node->next)
+
+/**
+ * @brief
+ * Цикл foreach, начинающий обход списка с конца.
+ * Его основная особенность в том, что здесь нет
+ * перехода между элементами списка. "Переход" ложится
+ * на совесть программиста.
+ * @param `i` счётчик цикла
+ * @param `list` список элементов
+*/
+#define FOREACH_NODE_FROM_END_WITHOUT_TRANSITION(i, list) \
+  i = list->length; \
+  for (list_node_t node = list->last_node; \
+       i > 0; --i)
+
+list_t init(int nmemb, ...) {
+  list_t list = List(0, false);
+  va_list args;
+  va_start(args, nmemb);
+  for (unsigned i = 0; i < nmemb; i++) {
+    list_node_t node = calloc(1, sizeof(list_node_s));
+    node->payload = va_arg(args, unsigned int);
+    list->listInsertAtEnd(list, node);
+  }
+  va_end(args);
+
+  return list;
+}
+  
 
 #endif // LIST_LIBRARY_H
