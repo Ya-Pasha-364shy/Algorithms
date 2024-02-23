@@ -2,7 +2,7 @@
 
 ### Description:
 
-<b>ru:<b><br>
+<b>ru:</b><br>
 Здесь представлена реализация дву-связного списка.<br>
 Однако, некоторые методы ещё предстоит реализовать.<br>
 <br>
@@ -13,7 +13,7 @@
 сборщика Bazel (Bazelisk), через который будет удобно 
 запускать тесты и делать статические/динамические библиотеки<br>
 <br>
-<b>en:<b><br>
+<b>en:</b><br>
 Here is an implementation of a two-way linked list.<br>
 However, some methods have yet to be implemented.<br>
 <br>
