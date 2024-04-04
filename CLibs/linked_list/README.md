@@ -16,13 +16,9 @@ Here I try correspond to the pseudo-oop style.
 
 When all methods are implemented and tested - I'll make a Makefile or BUILD - a declarative assembly file Bazel collector (Bazelisk), through which it will be convenient run tests and make static/dynamic libraries
 
-
 ### Simple Build
 ```
 mkdir bin && cd bin
 cmake ../.
 make
 ```
-
-### PS
-Надеюсь, что данный связы
