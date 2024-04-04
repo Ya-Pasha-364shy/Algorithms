@@ -1,6 +1,9 @@
 #ifndef LIST_LIBRARY_H
 #define LIST_LIBRARY_H
 
+#include <time.h>
+#include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <malloc.h>
@@ -143,7 +146,7 @@ list_t listSort(list_t list);
 */
 void listReverseByPayloads(list_t list);
 
-// TODO(k1rch): реализовать
+// TODO(K1rch): реализовать
 // int listBsearch(list_t list, int number);
 
 /* Calls for initialize a two-way list */
@@ -161,6 +164,38 @@ void listReverseByPayloads(list_t list);
  * двух-сторонюю связность.
 */
 list_t List(size_t nmemb, bool make_random_values);
+
+/* some helpful methods */
+
+/**
+ * @brief
+ * Инициализирует спискок теми значениями, количество
+ * которых указано первым параметром, за ним идут сами значения.
+ * @param nmemb количество значений, может быть = 0
+ * @param __VA_ARGS__ значения
+*/
+list_t init(int8_t nmemb, ...);
+
+
+/**
+ * @brief
+ * Выполняет простой поиск в списке до тех пор, пока не найдет такого элемента
+ * в связном списке.
+ * Возвращает -1, если значение не найдено
+ * @param list двусвязный список типа `list_t`
+ * @param desired_node искомый узел типа `list_node_t`
+*/
+int findIndexByElement(list_t list, list_node_t desired_node);
+
+/**
+ * @brief
+ * Выполняет простой поиск в списке до тех пор, пока не найдет элемента,
+ * индекс которого соотвествует переданному. Возвращает NULL, если такой элемент
+ * не найден.
+ * @param list двусвязный список типа `list_t`
+ * @param desired_node_index индекс искомого узла
+*/
+list_node_t findElementByIndex(list_t list, size_t desired_node_index);
 
 /* defining of list and list_node by structs */
 
@@ -191,7 +226,7 @@ typedef struct list {
 
 typedef list_s* list_t;
 
-/* Macroses foreach */
+/* Macro foreach */
 
 /**
  * @brief
@@ -237,19 +272,10 @@ typedef list_s* list_t;
   for (list_node_t node = list->last_node; \
        i > 0; --i)
 
-list_t init(int nmemb, ...) {
-  list_t list = List(0, false);
-  va_list args;
-  va_start(args, nmemb);
-  for (unsigned i = 0; i < nmemb; i++) {
-    list_node_t node = calloc(1, sizeof(list_node_s));
-    node->payload = va_arg(args, unsigned int);
-    list->listInsertAtEnd(list, node);
-  }
-  va_end(args);
+/* helpful macro */
 
-  return list;
-}
-  
+#define LIKE(condition) __glibc_likely(condition)
+
+#define UNLIKE(condition) __glibc_unlikely(condition)
 
 #endif // LIST_LIBRARY_H
