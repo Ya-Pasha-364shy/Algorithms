@@ -1,7 +1,6 @@
-#include <time.h>
-#include <stdio.h>
-
 #include "list.h"
+
+/* static functions are "trusted" */
 
 static void setToDefaultsNode(list_node_t node) {
   node->next = NULL;
@@ -31,15 +30,6 @@ static list_node_t getNodeByIndex(list_t list, size_t index) {
   return NULL;
 }
 
-static list_node_t TEST_FUNCTION createRandomNode() {
-  list_node_t node = calloc(1, sizeof(list_node_s));
-  if (!node) {
-    return NULL;
-  }
-  node->payload = rand() % 100;
-  return node;
-}
-
 static list_node_t createCopyOfNode(list_node_t source_node) {
   list_node_t destination_node = calloc(1, sizeof(list_node_s));
   if (!destination_node) {
@@ -63,7 +53,7 @@ static list_t createCopyOfListByMoving(list_t source_list) {
 }
 
 static bool lessOrEqualThanPivot(const list_node_t pivot_obj,
-                          const list_node_t current_obj) {
+                                 const list_node_t current_obj) {
   return current_obj->payload <= pivot_obj->payload; 
 }
 
@@ -166,6 +156,10 @@ static list_t mergeLists(list_t less_than_pivot_list,
 }
 
 void listRemove(list_t list) {
+  if (LIKE(list == NULL)) {
+    return;
+  }
+
   size_t iterator;
   list_node_t tmp_cursor;
   FOREACH_NODE_FROM_END_WITHOUT_TRANSITION(iterator, list) {
@@ -186,7 +180,7 @@ list_t listInit(size_t size, bool make_random_values) {
     return NULL;
   }
   list->length = size;
-  if (!size) {
+  if (LIKE(size == 0)) {
     return list;
   }
 
@@ -225,6 +219,9 @@ list_t listInit(size_t size, bool make_random_values) {
 }
 
 void listInsertAtEnd(list_t list, list_node_t node) {
+  if (LIKE(node == NULL) || LIKE(list == NULL)) {
+    return;
+  }
   if (thisNodeAlreadyExistsByMemory(node, list)) {
     return;
   }
@@ -249,7 +246,10 @@ void listInsertAtEnd(list_t list, list_node_t node) {
   }
 }
 
-void listInsertAtBegin(list_t list, list_node_t node)  {
+void listInsertAtBegin(list_t list, list_node_t node) {
+  if (LIKE(list == NULL) || LIKE(node == NULL)) {
+    return;
+  }
   if (thisNodeAlreadyExistsByMemory(node, list)) {
     return;
   }
@@ -274,7 +274,10 @@ void listInsertAtBegin(list_t list, list_node_t node)  {
   }
 }
 
-void listInsert(list_t list,  list_node_t node, size_t idx) {
+void listInsert(list_t list, list_node_t node, size_t idx) {
+  if (LIKE(list == NULL) || LIKE(node == NULL)) {
+    return;
+  }
   if (idx >= list->length) {
     return;
   }
@@ -333,7 +336,7 @@ void listRemoveAllNodes(list_t list) {
 }
 
 void listRemoveNodeByIndex(list_t list, size_t index) {
-  if (index >= list->length) {
+  if (LIKE(list == NULL) || LIKE(index >= list->length)) {
     return;
   }
 
@@ -356,7 +359,7 @@ void listRemoveNodeByIndex(list_t list, size_t index) {
 /* algorithms for linked list */
 
 void listPrint(const char* name, list_t list) {
-  if (!list) {
+  if (LIKE(list == NULL) || LIKE(name == NULL)) {
     return;
   }
   printf("%s = [ ", name);
@@ -369,14 +372,13 @@ void listPrint(const char* name, list_t list) {
 }
 
 list_t listSort(list_t list) {
-  if (list == NULL) {
+  if (LIKE(list == NULL)) {
     return NULL;
   }
-  if (list->length == 1) {
+  if (LIKE(list->length == 1)) {
     return list;
   }
 
-  // O(n) (на самом деле здесь пока что O(n^2))
   // TODO(K1rch): change O(n^2) on simple O(n)
   list_node_t pivot_node =
                   getNodeByIndex(list, list->length / 2);
@@ -390,6 +392,10 @@ list_t listSort(list_t list) {
 }
 
 void listReverseByPayloads(list_t list) {
+  if (LIKE(list == NULL)) {
+    return;
+  }
+  
   int tmp = 0;
   size_t gap = 0;
 
@@ -406,7 +412,7 @@ void listReverseByPayloads(list_t list) {
 }
 
 /*
-int listBsearch(list_t list, int number) {
+int listBsearch(list_t list, int payload) {
   size_t left = 0;
   size_t right = list->length - 1;
   while (left < right) {
@@ -437,38 +443,45 @@ list_t List(size_t nmemb, bool make_random_values) {
   return this;
 }
 
-int main(void) {
-  // size_t nmemb;
-  // printf("Get lenght of list: "); scanf("%ld", &nmemb);
+/* Some helpful methods */
 
-  list_t lst = init(3, 1, 2, 3);
+list_t init(int8_t nmemb, ...) {
+  list_t list = List(0, false);
+  va_list args;
+  va_start(args, nmemb);
+  for (unsigned i = 0; i < nmemb; i++) {
+    list_node_t node = calloc(1, sizeof(list_node_s));
+    node->payload = va_arg(args, unsigned int);
+    list->listInsertAtEnd(list, node);
+  }
+  va_end(args);
 
-  if (lst == NULL)
-    return EXIT_SUCCESS;
+  return list;
+}
 
-  list_node_t node1 = createRandomNode();
-  list_node_t node2 = createRandomNode();
-  list_node_t node3 = createRandomNode();
+int findIndexByElement(list_t list, list_node_t desired_node) {
+  int index = -1;
+  if (LIKE(list == NULL) || LIKE(desired_node == NULL)) {
+    return index;
+  }
 
-  lst->listInsertAtBegin(lst, node1);
-  lst->listInsertAtBegin(lst, node2);
-  lst->listInsertAtBegin(lst, node3);
-
-  lst = listSort(lst);
-  // listPrint("sorted", sorted);
-
-  printf("====\n");
   size_t iterator;
-  FOREACH_NODE_FROM_BEGIN(iterator, lst) {
-    printf("payload = %d\n", node->payload);
+  FOREACH_NODE_FROM_BEGIN(iterator, list) {
+    if (node == desired_node ||
+        node->payload == desired_node->payload) {
+      index = iterator;
+      break;
+    }
   }
-  printf("====\n");
-  FOREACH_NODE_FROM_END(iterator, lst) {
-    printf("payload = %d\n", node->payload);
+
+  return index;
+}
+
+list_node_t findElementByIndex(list_t list, size_t desired_node_index) {
+  list_node_t required_node = NULL;
+  if (LIKE(list == NULL) || LIKE(desired_node_index >= list->length)) {
+    return required_node;
   }
-  printf("====\n");
 
-  lst->listRemove(lst);
-
-  return EXIT_SUCCESS;  
+  return getNodeByIndex(list, desired_node_index);
 }
