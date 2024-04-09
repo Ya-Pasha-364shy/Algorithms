@@ -113,6 +113,18 @@ void listRemoveAllNodes(list_t list);
 */
 void listRemoveNodeByIndex(list_t list, size_t index);
 
+/**
+ * @brief
+ * Функция, удаляющая элемент с конца списка
+*/
+void listRemoveNodeFromEnd(list_t list);
+
+/**
+ * @brief
+ * Функция, удаляющая элемент с начала
+*/
+void listRemoveNodeFromBegin(list_t list);
+
 /* algorithms for linked list */
 
 /**
@@ -215,6 +227,8 @@ typedef struct list {
   list_node_t first_node;
 
   void (*listRemove)(struct list*);
+  void (*listRemoveNodeFromEnd)(struct list* list);
+  void (*listRemoveNodeFromBegin)(struct list* list);
 
   void (*listInsertAtEnd)(struct list* list, list_node_t node);
   void (*listInsertAtBegin)(struct list* list, list_node_t node);

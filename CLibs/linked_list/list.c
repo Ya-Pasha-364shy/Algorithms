@@ -203,13 +203,13 @@ list_t listInit(size_t size, bool make_random_values) {
     list_node_t tmp = malloc(sizeof(list_node_s));
     setToDefaultsNode(tmp);
 
-    cursor_on_previous->next = tmp;
     tmp->prev = cursor_on_previous;
     if (make_random_values) {
       tmp->payload = rand() % 100;  
     } else {
       tmp->payload = 0;
     }
+    cursor_on_previous->next = tmp;
     cursor_on_previous = tmp;
   }
   list->last_node = cursor_on_previous;
@@ -338,6 +338,10 @@ void listRemoveAllNodes(list_t list) {
 void listRemoveNodeByIndex(list_t list, size_t index) {
   if (LIKE(list == NULL) || LIKE(index >= list->length)) {
     return;
+  } else if (index == 0) {
+    return listRemoveNodeFromBegin(list);
+  } else if (index == list->length - 1) {
+    return listRemoveNodeFromEnd(list);
   }
 
   size_t iterator; 
@@ -353,6 +357,32 @@ void listRemoveNodeByIndex(list_t list, size_t index) {
   }
   node_to_remove->prev->next = node_to_remove->next;
   node_to_remove->next->prev = node_to_remove->prev;
+  list->length--;
+  free(node_to_remove);
+}
+
+void listRemoveNodeFromEnd(list_t list) {
+  if (list == NULL) {
+    return;
+  }
+  list_node_t node_to_remove = list->last_node;
+  node_to_remove->prev->next = list->first_node;
+  list->first_node->prev = node_to_remove->prev;
+  list->last_node = node_to_remove->prev;
+  list->length--;
+  free(node_to_remove);
+
+}
+
+void listRemoveNodeFromBegin(list_t list) {
+  if (list == NULL) {
+    return;
+  }
+  list_node_t node_to_remove = list->first_node;
+  node_to_remove->next->prev = list->last_node;
+  list->last_node->next = node_to_remove->next;
+  list->first_node = node_to_remove->next;
+  list->length--;
   free(node_to_remove);
 }
 
