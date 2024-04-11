@@ -23,7 +23,7 @@ void dequeueRemove(dequeue_t dequeue) {
 }
 
 int dequeuePop(dequeue_t dequeue) {
-  if (dequeue == NULL) {
+  if (dequeue == NULL || dequeue->length == 0) {
     return INT_MIN;
   }
   dequeue_node_t node_to_rm = dequeue->first_node;
@@ -38,21 +38,33 @@ int dequeuePop(dequeue_t dequeue) {
 void dequeuePush(dequeue_t dequeue, dequeue_node_t node) {
   if (dequeue == NULL || node == NULL) {
     return;
+  } else if (dequeue->last_node == NULL && dequeue->first_node == NULL) {
+    // выполнится на этапе инициализации очереди или тогда
+    // когда она была полностью очищена и занова создана.
+    dequeue->first_node = node;
+    dequeue->first_node->prev = NULL;
+    dequeue->length++;
+    return;
+  } else if (dequeue->last_node == NULL && dequeue->first_node != NULL) {
+    dequeue->last_node = node;
+    dequeue->first_node->prev = dequeue->last_node;
+  } else {
+    dequeue->last_node->prev = node;
+    dequeue->last_node = node;
   }
-  node->prev = NULL;
-  dequeue->last_node->prev = node;
-  dequeue->last_node = node;
+  dequeue->last_node->prev = NULL;
   dequeue->length++;
 }
 
 int dequeuePopAtTheEnd(dequeue_t dequeue) {
   int returned_payload;
-  if (dequeue == NULL) {
+  if (dequeue == NULL || dequeue->length == 0) {
     return INT_MIN;
   } else if (dequeue->length == 1) {
-    returned_payload = dequeue->last_node->payload;
-    dequeueRemove(dequeue);
-    return dequeue->last_node->payload;
+    returned_payload = dequeue->first_node->payload;
+    free(dequeue->first_node);
+    dequeue->length--;
+    return returned_payload;
   }
 
   size_t iterator;
@@ -77,11 +89,11 @@ int dequeuePopAtTheEnd(dequeue_t dequeue) {
 void dequeuePushAtTheBegin(dequeue_t dequeue, dequeue_node_t node) {
   if (dequeue == NULL || node == NULL) {
     return;
-  }
+  } 
   node->prev = dequeue->first_node;
   dequeue->first_node = node;
+  dequeue->length++;
 }
-
 
 dequeue_t dequeueInit(size_t size, bool make_random_values) {
   dequeue_t dequeue = calloc(1, sizeof(dequeue_s));
