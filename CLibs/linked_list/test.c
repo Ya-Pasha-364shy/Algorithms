@@ -3,7 +3,7 @@
 
 #include "list.h"
 
-static list_node_t TEST_FUNCTION createRandomNode() {
+static list_node_t createRandomNode() {
   list_node_t node = calloc(1, sizeof(list_node_s));
   if (!node) {
     return NULL;
