@@ -7,33 +7,34 @@
 namespace BinaryTreeSearch {
 
 struct BTSNode {
-	int key;
-	BTSNode* left;
-	BTSNode* right;
+  int key;
+
+  BTSNode* left;
+  BTSNode* right;
 };
 
 class BTS {
  public:
-	BTS();
+  BTS();
 
-	const BTSNode *getNode();
+  const BTSNode *getNode();
 
-	void printTree(const BTSNode *node, int level);
+  void printTree(const BTSNode *node=NULL, int level=0);
 
-	void deleteTree(BTSNode *root_node);
+  void deleteTree(BTSNode *root_node);
 
-	void insertNodeByKey(int key);
+  void insertNodeByKey(int key);
 
-	int searchKeyInTreeRecursive(int key, const BTSNode *node);
+  int searchKeyInTreeRecursive(int key, const BTSNode *node);
 
-	int searchByKey(int key);
+  int searchByKey(int key);
 
-	~BTS();
+  ~BTS();
 
  private:
-	BTSNode *root_node = NULL;
+  BTSNode *root_node = NULL;
 
-	void insertNodeInTreeByKey(int key, BTSNode* node);
+  void insertNodeInTreeByKey(int key, BTSNode* node);
 };
 
 }; // namespace BinaryTreeSearch
