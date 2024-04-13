@@ -13,11 +13,6 @@ struct BTSNode {
 };
 
 class BTS {
- private:
-	BTSNode *root_node = NULL;
-
-	void insertNodeInTreeByKey(int key, BTSNode* node);
-
  public:
 	BTS();
 
@@ -34,6 +29,11 @@ class BTS {
 	int searchByKey(int key);
 
 	~BTS();
+
+ private:
+	BTSNode *root_node = NULL;
+
+	void insertNodeInTreeByKey(int key, BTSNode* node);
 };
 
 }; // namespace BinaryTreeSearch
