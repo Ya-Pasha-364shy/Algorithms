@@ -16,8 +16,18 @@ In this section, a library is created that helps to conveniently build graphs (i
 
 ## Build 
 
-```
+```bash
 mkdir bin && cd bin
 cmake ../.
 make
+```
+Or if you are using `VSCode` with `CMake Tools` extension, then :
+```bash
+cd Algorithms/CPPLibs/Graph
+code . # starting a vscode in this directory
+# ctrl+shift+p:
+## >CMake: Scan for kits
+## >Cmake: Configure 
+## >Cmake: Select Variant (i use debug)
+## >Cmake: Debug
 ```
