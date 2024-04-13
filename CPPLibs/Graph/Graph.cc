@@ -1,3 +1,4 @@
+#include <cassert>
 #include "Graph.hpp"
 
 namespace graph {
@@ -31,6 +32,7 @@ void Graph::addNodeByKeyInEnd(uint64_t key) {
 
     current_node = finish_node;
   }
+  ++counter_of_nodes;
 }
 
 void Graph::addNodeByKeyInBegin(uint64_t key) {
@@ -57,6 +59,7 @@ void Graph::addNodeByKeyInBegin(uint64_t key) {
 
     start_node = new_node;
   }
+  ++counter_of_nodes;
 }
 
 void Graph::addNodeByKeyToParentOfTracking(uint64_t key) {
@@ -68,9 +71,6 @@ void Graph::addNodeByKeyToParentOfTracking(uint64_t key) {
     current_node = start_node;
   } else if (current_node != NULL) {
     GraphNode *parent_node_of_current = getParentNode();
-    if (parent_node_of_current != NULL) {
-      return;
-    }
     new_node->setParentNode(parent_node_of_current);
     current_node = new_node;
 
@@ -83,6 +83,7 @@ void Graph::addNodeByKeyToParentOfTracking(uint64_t key) {
       finish_node = new_node;
     }
   }
+  ++counter_of_nodes;
 }
 
 void Graph::removeNodeByKey(uint64_t key) {
@@ -102,6 +103,9 @@ void Graph::DijkstraPathSearch(GraphNode *searched_node,
 void Graph::getAllNodes(std::deque<const GraphNode *>& accumulator,
                         GraphNode *tracking_node) {
   if (tracking_node == NULL) {
+    if (start_node == NULL and finish_node == NULL) {
+      return;
+    }
     tracking_node = start_node;
   }
   uint64_t link_key = 0, this_key = tracking_node->getKey();
@@ -135,6 +139,8 @@ void Graph::getAllNodes(std::deque<const GraphNode *>& accumulator,
       getAllNodes(accumulator, link_node);
     }
   }
+  assert(accumulator.size() == counter_of_nodes &&
+         "Number of nodes doesn't correspond the counter value");
 }
 
 void Graph::removeGraph() {
@@ -147,6 +153,7 @@ void Graph::removeGraph() {
     all_nodes.pop_front();
     delete node;
   }
+  counter_of_nodes = 0;
 }
 
 Graph::~Graph() {

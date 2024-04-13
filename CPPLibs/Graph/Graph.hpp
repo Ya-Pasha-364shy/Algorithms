@@ -219,6 +219,7 @@ class Graph {
   void getAllNodes(std::deque<const GraphNode *>& accumulator,
                    GraphNode *tracking_node=NULL);
 
+  uint32_t counter_of_nodes = 0;
   /* "точка старта" */
   GraphNode *start_node = NULL;
   /* "точка выхода" */
@@ -230,5 +231,4 @@ class Graph {
 };
 
 };
-
 #endif // THE_GRAPH_HPP
