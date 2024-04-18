@@ -1,4 +1,7 @@
+#include <queue>
 #include <cassert>
+#include <iostream>
+
 #include "Graph.hpp"
 
 namespace graph {
@@ -90,9 +93,60 @@ void Graph::removeNodeByKey(uint64_t key) {
   // pass
 }
 
-void Graph::BreadthFirstSearch(GraphNode *searched_node,
-                               GraphNode *start_node) {
-  // pass
+
+bool Graph::BreadthFirstSearch(const GraphNode *searched_node,
+                               const GraphNode *start_node) {
+  if (searched_node == NULL and finish_node_exists()) {
+    searched_node = finish_node;
+  }
+  if (start_node == NULL and start_node_exists()) {
+    start_node = this->start_node;
+  }
+  if (not searched_node or not start_node) {
+    return false;
+  }
+  hash_visited_node.erase(hash_visited_node.begin(), hash_visited_node.end());
+
+  bool is_running = true;
+  uint64_t neighbour_key = 0, searched_key = searched_node->getKey();
+  GraphNode *current_neighbour = NULL;
+  std::queue<const GraphNode *> queue_of_neighbours;
+  // std::list<GraphNode *> shortest_way_to_searched;
+
+  queue_of_neighbours.push(start_node);
+  hash_visited_node[start_node->getKey()] = true;
+
+  while (not queue_of_neighbours.empty() and is_running) {
+    const GraphNode *tracking_node = queue_of_neighbours.front();
+    queue_of_neighbours.pop();
+
+    std::list<GraphEdge> edges_to_neighbours = tracking_node->getListEdges();
+    for (auto iterator = edges_to_neighbours.begin(); iterator != edges_to_neighbours.end();
+         ++iterator)
+    {
+      current_neighbour = iterator->getRightNode();
+      if (current_neighbour == NULL) {
+        assert(true == false);
+      }
+      neighbour_key = current_neighbour->getKey();
+
+      if (neighbour_key == searched_key) {
+        is_running = false;
+        break;
+      }
+
+      if (not hash_visited_node[neighbour_key]) {
+        hash_visited_node.at(neighbour_key) = true;
+        queue_of_neighbours.push(current_neighbour);
+      }
+    }
+  }
+
+  // TODO(K1rch):
+  // нужно построить дерево поиска (не бинарное), которое бы возвращало наикратчайший путь до точки
+  // assert(not shortest_way_to_searched.empty());
+  hash_visited_node.erase(hash_visited_node.begin(), hash_visited_node.end());
+  return (not is_running) ? true : false; 
 }
 
 void Graph::DijkstraPathSearch(GraphNode *searched_node,
@@ -109,6 +163,8 @@ void Graph::getAllNodes(std::deque<const GraphNode *>& accumulator,
     tracking_node = start_node;
   }
   uint64_t link_key = 0, this_key = tracking_node->getKey();
+  // list of edges can't be empty if graph is linked
+  // TODO(K1rch): support empty case after supporting not linked graph
   std::list<GraphEdge> edges = tracking_node->getListEdges();
 
   if (hash_visited_node[this_key] == false) {
@@ -124,7 +180,7 @@ void Graph::getAllNodes(std::deque<const GraphNode *>& accumulator,
     }
   }
   if (it == edges.end()) {
-    // все соседи уже были обойдены - отслеживаемый узел крайний.
+    // все соседи уже были обойдены - отслеживаемая вершина крайняя
     return;
   }
 
@@ -139,13 +195,17 @@ void Graph::getAllNodes(std::deque<const GraphNode *>& accumulator,
       getAllNodes(accumulator, link_node);
     }
   }
-  assert(accumulator.size() == counter_of_nodes &&
-         "Number of nodes doesn't correspond the counter value");
+
 }
 
 void Graph::removeGraph() {
   std::deque<const GraphNode *> all_nodes;
   getAllNodes(all_nodes);
+
+  std::cout << "counter_of_nodes = " << counter_of_nodes << std::endl;
+  std::cout << "all_nodes.size()" << all_nodes.size() << std::endl;
+
+  assert(counter_of_nodes == all_nodes.size());
 
   size_t all_nodes_count = all_nodes.size();
   for (auto i = all_nodes_count; i != 0; --i) {
@@ -154,6 +214,7 @@ void Graph::removeGraph() {
     delete node;
   }
   counter_of_nodes = 0;
+
 }
 
 Graph::~Graph() {

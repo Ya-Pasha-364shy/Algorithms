@@ -15,10 +15,10 @@ class Graph {
   enum GraphEdgeType : uint8_t {
     /* задаёт несвязный граф */
     GRAPH_EDGE_INVALID = 0x00,
-    /* задаёт ориентированный связный граф */
+    /* задаёт неориентированный связный граф */
     GRAPH_EDGE_BIDIRECTIONAL = 0x01,
     /** 
-     * задаёт неорентированный связный граф,
+     * задаёт ориентированный связный граф,
      * однако возможна комбинация с типом BIDERECTIONAL.
     */
     GRAPH_EDGE_UNIDIRECTIONAL_LEFT = 0x02,
@@ -44,7 +44,7 @@ class Graph {
       parent_node = _parent_node;
     }
 
-    GraphNode *getParentNode() {
+    GraphNode *getParentNode() const {
       return parent_node;
     }
 
@@ -161,15 +161,19 @@ class Graph {
    * @brief
    * Осуществляет поиск кратчайшего пути
    * между двумя вершинами невзвешанного связанного графа.
+   * Сложность алгоритма поиска в ширину = O(V+E).
+   * 
    * @param searched_node точка до которой искать путь.
    * Если принимает значение NULL, то интерпретируется
    * как самая последняя вершина графа.
    * @param start_node точка от которой искать путь.
    * Если принимает значение NULL, то интерпретируется
    * как самая первая вершина графа. NULL по-умолчанию.
+   * @return true, если вершина найдена, иначе false
+   * TODO: возвращать кратчайший путь от start_node до searched_node
   */
-  void BreadthFirstSearch(GraphNode *searched_node,
-                          GraphNode *start_node=NULL);
+  bool BreadthFirstSearch(const GraphNode *searched_node = NULL,
+                          const GraphNode *start_node = NULL);
 
   /**
    * @brief
@@ -200,9 +204,13 @@ class Graph {
     return finish_node != NULL ? true : false;
   }
 
-  GraphNode *getParentNode() {
+  GraphNode *getParentNode() const {
     return current_node != NULL ?
              current_node->getParentNode() : NULL;
+  }
+
+  const GraphNode *getTrackingNode() const {
+    return current_node;
   }
 
   ~Graph();
