@@ -60,5 +60,35 @@ int main() {
     std::cout << "Path is finded !" << std::endl;
   }
 
+  std::cout << "Testing of Dijkstra's algorithm" << std::endl;
+
+  Graph test_dijkstra;
+  test_dijkstra.addNodeByKeyInBegin(0, 0);
+  test_dijkstra.addNodeByKeyInEnd(2, 2);
+  test_dijkstra.addNodeByKeyToParentOfTracking(1, 6);
+  test_dijkstra.addNodeByKeyInEnd(3, 4);
+  test_dijkstra.addNodeByKeyInEnd(4, 1);
+
+  test_dijkstra.addBidirectionalLinkBetweenTwoNodes(1, 2, 1);
+  test_dijkstra.addBidirectionalLinkBetweenTwoNodes(1, 3, 4);
+  
+  /**
+   * (0)<---6--->(1)<---4---->
+   *  \           \           \
+   *   2          1            4      
+   *    \          \            \
+   *     \<---2--->(2)<---4--->(3)<---1--->(4)
+  */
+
+  uint64_t cost_path_to_end = test_dijkstra.leastWeightPathSearch();
+  assert(cost_path_to_end == 7);
+  std::cout << "[1] result cost = " << cost_path_to_end << std::endl;
+  
+  test_dijkstra.addBidirectionalLinkBetweenTwoNodes(1, 4, 1);
+  cost_path_to_end = test_dijkstra.leastWeightPathSearch();
+  assert(cost_path_to_end == 4);
+  std::cout << "[2] result cost = " << cost_path_to_end << std::endl;
+  
+
   return EXIT_SUCCESS;
 }
