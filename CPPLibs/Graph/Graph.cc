@@ -238,10 +238,9 @@ uint64_t Graph::leastWeightPathSearch(const GraphNode *searched_node,
 
     uint64_t new_cost_from_selected = 0;
     /**
-     * 2) получаем соседей узла относительно tracking_node
+     * 2) получаем соседей узла относительно lowest_cost_node
     */
-    const std::list<GraphEdge> neighbours_of_selected =
-      lowest_cost_edge->getRightNode()->getListEdges();
+    const std::list<GraphEdge> neighbours_of_selected = lowest_cost_node->getListEdges();
 
     for (auto edge: neighbours_of_selected) {
       new_cost_from_selected = edge.getWeight() + select_node_cost;
@@ -257,13 +256,11 @@ uint64_t Graph::leastWeightPathSearch(const GraphNode *searched_node,
      * 3) повторяем до тех пор, пока не будет выполнено для всех узлов графа
     */
     tracking_node = lowest_cost_node;
-    if (tracking_node->getKey() == searched_node->getKey()) {
-      break;
-    }
     lowest_cost_pair = findLowestCostEdge(tracking_node);
     if (lowest_cost_pair.second != false) {
       lowest_cost_edge = lowest_cost_pair.first;
     } else {
+      // доступных узлов для переходов больше нет
       break;
     }
   }
