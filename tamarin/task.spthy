@@ -1,0 +1,206 @@
+theory ISO
+begin
+
+builtins: signing, diffie-hellman
+
+rule Client_Step_1:
+let
+    pk_C = pk(~pr_C)
+    g_x = 'g'^(~x)
+in
+    [
+        Fr(~pr_C),
+        Fr(~x)
+    ]
+    --[
+        Send_1($Client, $Server, <pk_C, g_x>)
+    ]->
+    [
+        Out(<pk_C, g_x>),
+        !Client_Step_1(~pr_C, pk_C, ~x, g_x)
+    ]
+
+
+rule Server_Step_1:
+let
+    pk_S = pk(~pr_S)
+    g_y = 'g'^(~y)
+    server_key = g_x^(~y)
+    server_message = <g_x, g_y, pk_C>
+    serv_message_sign = sign(server_message, ~pr_S)
+in
+    [
+        Fr(~pr_S),
+        Fr(~y),
+        In(<pk_C, g_x>)
+    ]
+    --[
+        Receive_1($Server, $Client, <pk_C, g_x>),
+        Send_2($Server, $Client, <pk_S, g_y, serv_message_sign>)
+    ]->
+    [
+        !Server_Step_1(~pr_S, pk_S, pk_C, ~y, g_y, g_x, server_key),
+        Out(<pk_S, g_y, serv_message_sign>)
+    ]
+
+rule Client_Step_2:
+let
+    server_message = <g_x, g_y, pk_C>
+    client_message = <g_y, g_x, pk_S>
+    client_message_sign = sign(client_message, ~pr_C)
+    client_key = g_y^(~x)
+in
+    [
+        !Client_Step_1(~pr_C, pk_C, ~x, g_x),
+        In(<pk_S, g_y, serv_message_sign>),
+    ]
+    --[
+        Eq(verify(serv_message_sign, server_message, pk_S), true),
+        Receive_2($Client, $Server, <pk_S, g_y, serv_message_sign>),
+        Send_3($Client, $Server, client_message_sign),
+        Client_Finished($Client, client_key)
+    ]->
+    [
+        Out(client_message_sign),
+        !Client_Step_2(client_key, pk_S, g_y)
+    ]
+
+rule Server_Step_2:
+let
+    client_message = <g_y, g_x, pk_S>
+in 
+    [
+        !Server_Step_1(~pr_S, pk_S, pk_C, ~y, g_y, g_x, server_key),
+        In(client_message_sign)
+    ]
+    --[
+        Eq(verify(client_message_sign, client_message, pk_C), true),
+        Receive_3($Server, $Client, client_message_sign),
+        Server_Finished($Server, server_key)
+    ]->
+    [
+        !Serv_Step_2(pk_C)
+    ]
+
+restriction Equality:
+    "All x y #i. Eq(x,y) @i ==> x = y"
+
+/* ============== Первая часть ============== */
+
+/* 
+ * существует сервер, клиент и сессионный ключ такие, что клиент
+ * смог установить соединение с сервером.
+ */
+lemma exec_fin:
+    exists-trace
+    "Ex Client Server key #i #j.
+        Client_Finished(Client, key) @i & 
+        Server_Finished(Server, key) @j
+    "
+
+/*
+ * существует сервер, клиент и такое сообщение, что клиент
+ * отправил 1-сообщение, а сервер его получил.
+ */
+lemma exec_1_recv_server:
+    exists-trace
+    "Ex Client Server message #i #j.
+        Receive_1(Server, Client, message) @i & 
+        Send_1(Client, Server, message) @j
+    "
+
+/*
+ * существует сервер, клиент и сообщение такое, что сервер
+ * отправил 2-сообщение, и клиент его получил.
+*/
+lemma exec_2_recv_client:
+    exists-trace
+    "Ex Client Server message #i #j.
+        Receive_2(Server, Client, message) @i & 
+        Send_2(Client, Server, message) @j"
+
+/*
+ * существует сервер, клиент и сообщение такое, что клиент
+ * отправил третье сообщение, и сервер его получил.
+*/
+lemma exec_3_recv_server:
+    exists-trace
+    "Ex Client Server message #i #j.
+        Receive_3(Server, Client, message) @i & 
+        Send_3(Client, Server, message) @j
+    "
+
+/* ============== Вторая часть ============== */
+
+/*
+ * для любого сервера, клиента и сессионного ключа, если клиент
+ * смог установить соединение с сервером, то противник не может
+ * узнать сессионный ключ.
+*/
+lemma Key_secrecy:
+    all-traces
+    "All Client Server key #t1 #t2.
+    (
+        Client_Finished(Client, key) @t1 &
+        Server_Finished(Server, key) @t2
+    )
+    ==>
+    (
+        not
+        (
+            Ex #k.
+            (
+                K(key) @ #k
+            )
+        )
+    )
+    "
+
+/*
+ * для любого сервера, клиента и сообщения, если клиент смог
+ * установить соединение с сервером и сервер получил первое
+ * сообщение, то его отправил именно клиент
+*/
+lemma auth_1:
+    "All Client Server message key #t1 #t2 #t.
+    (
+        Client_Finished(Client, key) @t1 &
+        Server_Finished(Server, key) @t2 &
+        Receive_1(Server, Client, message) @t
+    )
+    ==>
+    (Ex #j. Send_1(Client, Server, message) @j & j<t)
+    "
+
+/*
+ * для любого сервера, клиента и сообщения, если клиент смог
+ * установить соединение с сервером и клиент получил второе
+ * сообщение, то его отправил именно сервер
+*/
+lemma auth_2:
+    "All Client Server key message #t1 #t2 #t.
+    (
+        Client_Finished(Client, key) @t1 & 
+        Server_Finished(Server, key) @t2 &
+        Receive_2(Client, Server, message) @t
+    )
+    ==> 
+        (Ex #j. Send_2(Server, Client, message) @j & j<t)
+    "
+
+/*
+ * для любого сервера, клиента и сообщения, если клиент смог
+ * установить соединение с сервером и сервер получил третье
+ * сообщение, то его отправил именно клиент
+*/
+lemma auth_3:
+    "All Client Server key message #t1 #t2 #t.
+    (
+        Client_Finished(Client, key) @t1 & 
+        Server_Finished(Server, key) @t2 &
+        Receive_3(Server, Client, message) @t
+    )
+    ==> 
+        (Ex #j. Send_3(Client, Server, message) @j & j<t)
+    "
+end
