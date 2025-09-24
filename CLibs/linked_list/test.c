@@ -1,77 +1,51 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <assert.h>
 
-#include "list.h"
+#include "linked_list.h"
 
-static list_node_t createRandomNode() {
-  list_node_t node = calloc(1, sizeof(list_node_s));
-  if (!node) {
-    return NULL;
-  }
-  node->payload = rand() % 100;
-  return node;
-}
+#define LL_MAX_ITEM_VALUE 10000
+#define LL_MAX_LENGTH 1000
 
-int main(void) {
-  // size_t nmemb;
-  // printf("Get lenght of list: "); scanf("%ld", &nmemb);
+int main()
+{
+    int_linked_list_t *ll_test = ll_init();
+    if (!ll_test) {
+        return -1;
+    }
+    int tmp_rand, i, j;
 
-  list_t lst = init(3, 1, 2, 3);
+    srand(time(NULL));
 
-  if (lst == NULL)
-    return EXIT_FAILURE;
+    for (i = 0; i < LL_MAX_LENGTH; i++) {
+        tmp_rand = rand() % LL_MAX_ITEM_VALUE;
+        if (tmp_rand % 2 == 0) {
+            if (!ll_push_back(ll_test, tmp_rand)) {
+                break;
+            }
+        } else {
+            j = rand() % (i+1);
+            if (!ll_insert(ll_test, i-j, tmp_rand)) {
+                break;
+            }
+        }
+    }
+    assert(ll_test->size == LL_MAX_LENGTH);
 
-  list_node_t node1 = createRandomNode();
-  list_node_t node2 = createRandomNode();
-  list_node_t node3 = createRandomNode();
+    ll_pop_back(ll_test);
+    ll_pop_back(ll_test);
+    ll_pop_back(ll_test);
+    ll_erase_value(ll_test, 100);
+    ll_erase_value(ll_test, 1000);
+    ll_erase_value(ll_test, 56);
+    ll_erase_value(ll_test, __INT_MAX__);
+    ll_erase_value_by_idx(ll_test, 0);
+    ll_erase_value_by_idx(ll_test, ll_test->size-1);
+    ll_erase_value_by_idx(ll_test, ll_test->size/2);
+    
+    ll_sort(&ll_test);
+    ll_destroy(ll_test);
 
-  lst->listInsertAtBegin(lst, node1);
-  lst->listInsertAtBegin(lst, node2);
-  lst->listInsertAtBegin(lst, node3);
-
-  printf("[before] node1 index = %d; node value = %d\n", findIndexByElement(lst, node1), node1->payload);
-  printf("[before *by idx*] node1 index = 0; node value = %d\n", findElementByIndex(lst, 0)->payload);
-  
-  // lst = listSort(lst);
-  // printf("[after]  node1 index = 0; node value = %d\n", findElementByIndex(lst, 0)->payload);
-
-  printf("====\n");
-  size_t iterator;
-  FOREACH_NODE_FROM_BEGIN(iterator, lst) {
-    printf("payload = %d\n", node->payload);
-  }
-  printf("====\n");
-
-  size_t ln = lst->length; 
-  listRemoveNodeFromBegin(lst);
-  ln -= 1;
-  assert(ln == lst->length);
-  printf("==== AFTER REMOVING ITEM FROM BEGIN ====\n");
-  FOREACH_NODE_FROM_BEGIN(iterator, lst) {
-    printf("payload = %d\n", node->payload);
-  }
-  printf("====\n");
-
-  listRemoveNodeFromEnd(lst);
-  ln -= 1;
-  assert(ln == lst->length);
-
-  printf("==== AFTER REMOVING ITEM FROM END ====\n");
-  FOREACH_NODE_FROM_BEGIN(iterator, lst) {
-    printf("payload = %d\n", node->payload);
-  }
-  printf("====\n");
-
-  listRemoveNodeByIndex(lst, 1);
-  ln -= 1;
-  assert(ln == lst->length);
-  printf("==== AFTER REMOVING BY INDEX=1 ====\n");
-  FOREACH_NODE_FROM_BEGIN(iterator, lst) {
-    printf("payload = %d\n", node->payload);
-  }
-  printf("====\n");
-
-  lst->listRemove(lst);
-
-  return EXIT_SUCCESS;  
+    return 0;
 }
