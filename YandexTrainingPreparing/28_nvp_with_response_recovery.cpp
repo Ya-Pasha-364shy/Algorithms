@@ -22,7 +22,7 @@
  * необходимо вывести одну (любую) из них.
  * 
  * Пример:
- * Ввод:)
+ * Ввод:
  * 6
  * 3 29 5 5 28 6
  * Вывод:
@@ -32,11 +32,8 @@
 using namespace std;
 
 void dp(vector<int> &input_a, vector<int> *output_a, size_t N) {
-    vector<int> nvp_lens(N);
-    nvp_lens.assign(N, 1);
-
-    vector<int> parent(N);
-    parent.assign(N, -1);
+    vector<int> nvp_lens(N, 1);
+    vector<int> parent(N, -1);
 
     int best_len = 0;
     int best_idx = 0;
