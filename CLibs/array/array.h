@@ -1,8 +1,6 @@
-#ifndef ARRAY_HEADER_H
-#define ARRAY_HEADER_H
+#ifndef _ARRAY_HEADER_H_
+#define _ARRAY_HEADER_H_
 
-#include <stdlib.h>
-#include <errno.h>
 #include <stdbool.h>
 
 typedef struct int_array_s {
@@ -79,4 +77,4 @@ bool array_bin_search(int_array_t *array, int search_value);
 /// @return `true` if value was finded, `false` - otherwise
 bool array_search(int_array_t *array, int search_value);
 
-#endif // ARRAY_HEADER_H
+#endif // _ARRAY_HEADER_H_

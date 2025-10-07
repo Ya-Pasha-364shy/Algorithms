@@ -1,5 +1,5 @@
-#ifndef LL_ONE_WAY_HEADER_H
-#define LL_ONE_WAY_HEADER_H
+#ifndef _LL_ONE_WAY_HEADER_H_
+#define _LL_ONE_WAY_HEADER_H_
 
 #include <stdlib.h>
 #include <errno.h>
@@ -70,4 +70,4 @@ void ll_sort(int_linked_list_t **ll);
 /// @return positive integer if value was founded, `-1` - otherwise
 int ll_search_value(int_linked_list_t *ll, int sv);
 
-#endif // LL_ONE_WAY_HEADER_H
+#endif // _LL_ONE_WAY_HEADER_H_
