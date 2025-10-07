@@ -1,8 +1,6 @@
-#ifndef QUEUE_HEADER_H
-#define QUEUE_HEADER_H
+#ifndef _QUEUE_HEADER_H_
+#define _QUEUE_HEADER_H_
 
-#include <stdlib.h>
-#include <errno.h>
 #include <stdbool.h>
 
 typedef struct int_queue_s {
@@ -31,4 +29,4 @@ void queue_print(int_queue_t *queue);
 
 bool queue_is_empty(int_queue_t *queue);
 
-#endif // QUEUE_HEADER_H
+#endif // _QUEUE_HEADER_H_
