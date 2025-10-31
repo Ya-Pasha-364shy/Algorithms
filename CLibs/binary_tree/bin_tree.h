@@ -1,5 +1,5 @@
-#ifndef BINARY_TREE_SEARCH_H
-#define BINARY_TREE_SEARCH_H
+#ifndef _BINARY_TREE_SEARCH_H_
+#define _BINARY_TREE_SEARCH_H_
 
 typedef struct bin_tree_node_s {
     int key;
@@ -23,4 +23,4 @@ void bin_tree_print(bin_tree_t *tree);
 
 bool bin_tree_search(bin_tree_t *tree, int search_value);
 
-#endif // BINARY_TREE_SEARCH_H
+#endif // _BINARY_TREE_SEARCH_H_

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <errno.h>
 
 #include "linked_list_2.h"
 
@@ -241,8 +242,10 @@ void ll2_sort(int_linked_list2_t **ll) {
         min->next_node = ll2_new->sentinel_node;
         if (ll2_new->size == 0) {
             ll2_new->sentinel_node->next_node = min;
+            min->prev_node = ll2_new->sentinel_node;
         } else {
             ll2_new->last_node->next_node = min;
+            min->prev_node = ll2_new->last_node;
         }
         ll2_new->last_node = min;
         ll2_new->size++;

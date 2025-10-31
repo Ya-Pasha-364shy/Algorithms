@@ -1,8 +1,6 @@
-#ifndef LL_TWO_WAY_HEADER_H
-#define LL_TWO_WAY_HEADER_H
+#ifndef _LL_TWO_WAY_HEADER_H_
+#define _LL_TWO_WAY_HEADER_H_
 
-#include <stdlib.h>
-#include <errno.h>
 #include <stdbool.h>
 
 typedef struct int_linked_list_node_s {
@@ -65,10 +63,12 @@ void ll2_print(int_linked_list2_t *ll);
 /// @param ll Object in which payload will be sorted
 void ll2_sort(int_linked_list2_t **ll);
 
-/// @brief Finds passed item in passed array by linear search method in O(N)
+/// @brief Finds first occurrence of passed item in passed linked list
+/// by linear search method in O(N)
 /// @param ll Object in which embedded payload will be searched
 /// @param sv Value to search
-/// @return positive integer if value was founded, `-1` - otherwise
+/// @return index of first occurrence of value in
+/// linked list if it was founded, `-1` - otherwise
 int ll2_search_value(int_linked_list2_t *ll, int sv);
 
-#endif // LL_TWO_WAY_HEADER_H
+#endif // _LL_TWO_WAY_HEADER_H_

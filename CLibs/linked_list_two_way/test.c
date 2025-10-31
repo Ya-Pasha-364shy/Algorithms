@@ -5,8 +5,8 @@
 
 #include "linked_list_2.h"
 
-#define LL_MAX_ITEM_VALUE 10000
-#define LL_MAX_LENGTH 1000
+#define LL_MAX_ITEM_VALUE 100000
+#define LL_MAX_LENGTH 10000
 
 int main()
 {
@@ -45,6 +45,33 @@ int main()
     ll2_erase_value_by_idx(ll2_test, ll2_test->size/2);
     
     ll2_sort(&ll2_test);
+
+    for (i = 0; i < LL_MAX_LENGTH/4; i++) {
+        tmp_rand = rand() % LL_MAX_ITEM_VALUE;
+        if (tmp_rand % 2 == 0) {
+            if (!ll2_push_back(ll2_test, tmp_rand)) {
+                break;
+            }
+        } else {
+            j = rand() % (i+1);
+            if (!ll2_insert(ll2_test, i-j, tmp_rand)) {
+                break;
+            }
+        }
+    }
+
+    ll2_sort(&ll2_test);
+
+    ll2_pop_back(ll2_test);
+    ll2_erase_value_by_idx(ll2_test, ll2_test->size/2);
+    ll2_pop_back(ll2_test);
+    ll2_erase_value_by_idx(ll2_test, ll2_test->size/2);
+    ll2_pop_back(ll2_test);
+    ll2_erase_value_by_idx(ll2_test, ll2_test->size/2);
+    ll2_pop_back(ll2_test);
+    ll2_erase_value_by_idx(ll2_test, ll2_test->size/2);
+    ll2_pop_back(ll2_test);
+
     ll2_destroy(ll2_test);
 
     return 0;

@@ -1,14 +1,9 @@
-<<<<<<< Updated upstream
-=======
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
 
->>>>>>> Stashed changes
 #include "array.h"
-
-#include <stdio.h>
 
 int_array_t *array_init(size_t N) {
     int_array_t *array = (int_array_t *)calloc(1, sizeof(int_array_t));
