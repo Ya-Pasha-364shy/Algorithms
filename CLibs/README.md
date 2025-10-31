@@ -4,6 +4,7 @@ here are some self-written libraries on C-language, follow `README.md` in each s
 
 All code described in the subfolders was checked by Valgrind before being published!
 
-TODO: CMakefiles
+TODO: General CMakefile with nested Makefiles
 TODO: github CI/CD
 TODO: compiler optimizations
+TODO: make code thread-safe

@@ -74,7 +74,7 @@ int main(void) {
         printf("success: item finded !");
     }
 
-    array_destroy(array);
+    array_destroy(&array);
 
     return 0;
 }

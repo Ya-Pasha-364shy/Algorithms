@@ -35,6 +35,21 @@
 можно сделать, используя задачи. Сначала делаем множество из уникальных наборов задач и идем по все задачам из списка.
 пропускаем в решаемые все уникальные и вычеркиваем их из множества уник. чисел, далее идем по остальным числам и добавляем их в список решаемых, если этого числа (задачи) нету в множестве уникальных. 
 
+```py
+n, k = map(int, input().split())
+problems = list(map(int, input().split()))
+uniq_problems = set(problems)
+tour = list(uniq_problems)
+
+if len(tour) < k:
+    for problem in problems:
+        if problem not in uniq_problems:
+            tour.append(problem)
+        else:
+            uniq_problems.discard(problem)
+print(*tour[:k])
+```
+
 ## "Табло с инкрментом"
 
 это я решил
