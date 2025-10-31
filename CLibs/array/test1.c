@@ -57,7 +57,7 @@ int main()
 
     array_sort(arr_test);
 
-    array_destroy(arr_test);
+    array_destroy(&arr_test);
 
     return 0;
 }

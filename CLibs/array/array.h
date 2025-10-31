@@ -27,7 +27,7 @@ int_array_t *array_init_default();
 /// @brief Frees memory that was occupied by int array object
 /// and embedded payload
 /// @param array Object to destroy
-void array_destroy(int_array_t *array);
+void array_destroy(int_array_t **array);
 
 /// @brief Adds to end of array new item 
 /// @param array Object into which push_back will be performed
@@ -57,6 +57,10 @@ bool array_erase_value(int_array_t *array, int value_to_erase);
 /// @param array Object into which erasing will be performed
 /// @param index Index at which erasure will be performed
 void array_erase_value_by_idx(int_array_t *array, size_t index);
+
+/// @brief Erase all items in array
+/// @param array Object into which clearing will be performed
+bool array_clean_all(int_array_t *array);
 
 /// @brief Prints all items of array with new-line symbol
 /// @param array Object in which embedded payload will be output

@@ -1,3 +1,11 @@
+<<<<<<< Updated upstream
+=======
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+
+>>>>>>> Stashed changes
 #include "array.h"
 
 #include <stdio.h>
@@ -26,12 +34,19 @@ int_array_t *array_init_default() {
     return array_init(0);
 }
 
-void array_destroy(int_array_t *array) {
-    if (array) {
-        free(array->payload);
+void array_destroy(int_array_t **array) {
+    if (!array) {
+        return;
     }
-    free(array);
-    array = NULL;
+    int_array_t *_array = *array;
+    
+    if (_array) {
+        free(_array->payload);
+        free(_array);
+        _array = NULL;
+
+        *array = NULL;
+    }
 }
 
 static bool array_extend(int_array_t *array) {
@@ -65,7 +80,7 @@ bool array_push_back(int_array_t *array, int value) {
 
     if (array->M == array->N) {
         if (!array_extend(array)) {
-            fprintf(stderr, "array_push_back: failed to push %d\n", value);
+            fprintf(stderr, "array_push_back: failed to push %d: unable to extend array\n", value);
             return false;
         }
     }
@@ -165,13 +180,24 @@ void array_erase_value_by_idx(int_array_t *array, size_t index) {
     array->M--;
 }
 
+bool array_clean_all(int_array_t *array) {
+    if (!array || !array->payload) {
+        fprintf(stderr, "<%s>: array or payload is NULL\n", __func__);
+        return false;
+    }
+    memset(array->payload, 0, array->M * sizeof(int));
+    array->M = 0;
+
+    return true;
+}
+
 void array_print(int_array_t *array) {
     if (!array || !array->payload) {
         fprintf(stderr, "<%s>: array or payload is NULL\n", __func__);
         return;
     }
 
-    int i = 0;
+    size_t i = 0;
     if (!array->M) {
         printf("[ ]\n");
         return;
