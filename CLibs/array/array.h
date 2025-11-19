@@ -40,6 +40,13 @@ bool array_push_back(int_array_t *array, int value);
 /// @return `true` if value at index was successfully inserted, `false` - otherwise
 bool array_insert(int_array_t *array, size_t index, int value);
 
+/// @brief Inserts value at index in array and shift others on 1 step to right
+/// @param array Object into which insertion will be performed
+/// @param dest_index Index for insert value
+/// @param src_index Index at needed value placed
+/// @return `true` if value at index was successfully inserted, `false` - otherwise
+bool array_rshift_insert(int_array_t *array, size_t dest_idx, size_t src_idx);
+
 /// @brief Removes last item in array
 /// @param array Object into which pop_back will be performed
 /// @return Value at the end 
@@ -67,6 +74,22 @@ void array_print(int_array_t *array);
 /// @brief Sorts passed array using "quicksort" method in O(N*log(N))
 /// @param array Object in which embedded payload will be sorted 
 void array_sort(int_array_t *array);
+
+/// @brief Sorts passed array using "insertion sort" method in O(N^2)
+/// @param array Object in which embedded payload will be sorted.
+void array_insertion_sort(int_array_t *array);
+
+/// @brief Sorts passed array using "selection sort" method in O(N^2)
+/// @param array Object in which embedded payload will be sorted.
+void array_selection_sort(int_array_t *array);
+
+/// @brief Sorts passed array using "bubble sort" method in O(N^2)
+/// @param array Object in which embedded payload will be sorted.
+void array_bubble_sort(int_array_t *array);
+
+/// @brief Sorts passed array using advanced "bubble sort" method in O(N^2)
+/// @param array Object in which embedded payload will be sorted.
+void array_advanced_bubble_sort(int_array_t *array);
 
 /// @brief Finds passed item in passed array by binary search method in O(log(N))
 /// @param array Object in which embedded payload will be searched
