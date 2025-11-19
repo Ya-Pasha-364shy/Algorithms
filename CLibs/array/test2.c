@@ -26,6 +26,8 @@ int main() {
     array_push_back(a, 11);
 
     array_print(a);
+    array_advanced_bubble_sort(a);
+    array_print(a);
 
     if (!array_erase_value(a, 11)) {
         printf("failed to erase 11");

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "array.h"
 
@@ -112,6 +113,32 @@ bool array_insert(int_array_t *array, size_t index, int value) {
     array->M++;
     array->is_sorted = false;
 
+    return true;
+}
+
+bool array_rshift_insert(int_array_t *array, size_t dest_index, size_t src_index) {
+    if (!array || !array->payload) {
+        fprintf(stderr, "<%s>: array or payload is NULL\n", __func__);
+        return false;
+    }
+    if (dest_index > src_index) {
+        fprintf(stderr, "<%s>: invalid dest or src index\n", __func__);
+        return false;
+    }
+    if (src_index > array->M) {
+        fprintf(stderr, "<%s>: src_index too big\n", __func__);
+        return false;
+    }
+
+    int *a_payload = array->payload;
+    int value_to_insert = a_payload[src_index];
+
+    // rshift
+    for (size_t i = src_index; i > dest_index; i--) {
+        a_payload[i] = a_payload[i-1];
+    }
+    // insert
+    a_payload[dest_index] = value_to_insert;
     return true;
 }
 
@@ -231,7 +258,7 @@ static void _array_sort(int *array, int l, int r) {
 }
 
 void array_sort(int_array_t *array) {
-    if (!array) {
+    if (!array || !array->payload) {
         fprintf(stderr, "<%s>: array or payload is NULL\n", __func__);
         return;
     }
@@ -240,8 +267,130 @@ void array_sort(int_array_t *array) {
     array->is_sorted = true;
 }
 
+void array_insertion_sort(int_array_t *array) {
+    if (!array || !array->payload) {
+        fprintf(stderr, "<%s>: array or payload is NULL\n", __func__);
+        return;
+    }
+    int arr_size = array->M, j, checker;
+
+    for (int i = 1; i < arr_size; i++) {
+        checker = array->payload[i];
+        j = 0;
+
+        for (; j < i; j++) {
+            if (array->payload[j] > checker) {
+                break;
+            }
+        }
+        if (j != i) {
+            if (!array_rshift_insert(array, j, i)) {
+                fprintf(stderr, "<%s>: failed to shift values on right and insert\n", __func__);
+                return;
+            }
+        }
+    }
+}
+
+void array_selection_sort(int_array_t *array) {
+    if (!array || !array->payload) {
+        fprintf(stderr, "<%s>: array or payload is NULL\n", __func__);
+        return;
+    }
+    int arr_size = array->M, min, min_j;
+
+    for (int i = 0; i < arr_size - 1; i++) {
+        min = array->payload[i];
+        min_j = i;
+        for (int j = i + 1; j < arr_size; j++) {
+            if (min > array->payload[j]) {
+                min = array->payload[j];
+                min_j = j;
+            }
+        }
+        if (min_j != i) {
+            array->payload[min_j] = array->payload[i];
+            array->payload[i] = min;
+        }
+    }
+}
+
+void array_bubble_sort(int_array_t *array) {
+    if (!array || !array->payload) {
+        fprintf(stderr, "<%s>: array or payload is NULL\n", __func__);
+        return;        
+    }
+    int *a_payload = array->payload;
+    int arr_size = array->M, tmp;
+    bool not_sorted = true;
+
+    while (not_sorted) {
+        not_sorted = false;
+        for (int i = 1; i < arr_size; i++) {
+            if (a_payload[i] < a_payload[i-1]) {
+                tmp = a_payload[i];
+                a_payload[i] = a_payload[i-1];
+                a_payload[i-1] = tmp;
+
+                not_sorted = true;
+            }
+        }
+    }
+}
+
+// Optimizations:
+// 1st. Changing directions of sorting (from start to end and from end to start) (not realized here)
+// 2d.  Using 'tmp' variable for temporary storing target value (insert in target index only if 'tmp' < payload[i]
+//      (if asc order uses))
+// 3rd. Changing borders of sorting
+
+void array_advanced_bubble_sort(int_array_t *array) {
+    if (!array || !array->payload) {
+        fprintf(stderr, "<%s>: array or payload is NULL\n", __func__);
+        return;        
+    }
+    int *a_payload = array->payload;
+    int64_t tmp = INT64_MAX;
+    int rborder = array->M, _tmp = 0;
+    bool not_sorted = true;
+
+    while (not_sorted) {
+        not_sorted = false;
+        for (int i = 1; i < rborder; i++) {
+            if (tmp != INT64_MAX) {
+                if (_tmp > a_payload[i]) {
+                    a_payload[i-1] = a_payload[i];
+                    if (i == rborder-1) {
+                        a_payload[i] = _tmp;
+                        rborder = i;
+                        tmp = INT64_MAX;
+                        not_sorted = true;
+                    }
+                } else {
+                    not_sorted = true;
+                    a_payload[i-1] = _tmp;
+                    tmp = INT64_MAX;
+                }
+            } else {
+                tmp = _tmp = a_payload[i-1];
+                if (_tmp > a_payload[i]) {
+                    a_payload[i-1] = a_payload[i];
+                    if (i == rborder-1) {
+                        a_payload[i] = _tmp;
+                        rborder = i;
+                        tmp = INT64_MAX;
+                        not_sorted = true;
+                    }
+                } else {
+                    tmp = INT64_MAX;
+                }
+            }
+        }
+    }
+}
+
 bool array_bin_search(int_array_t *array, int s_v) {
-    if (!array) {
+    if (!array || !array->payload) {
         fprintf(stderr, "<%s>: array or payload is NULL\n", __func__);
         return false;
     }
@@ -266,7 +415,7 @@ bool array_bin_search(int_array_t *array, int s_v) {
 }
 
 bool array_search(int_array_t *array, int s_v) {
-    if (!array) {
+    if (!array || !array->payload) {
         fprintf(stderr, "<%s>: array or payload is NULL\n", __func__);
         return false;
     }
