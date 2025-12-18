@@ -55,7 +55,7 @@ int main(void) {
     }
     array_print(array);
 
-    for (int i = 0; i < array->M; i++) {
+    for (size_t i = 0; i < array->M; i++) {
         if (array_bin_search(array, array->payload[i]) != true) {
             printf("Failed to find: %d by binary search in array !\n", array->payload[i]);
         } else {

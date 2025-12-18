@@ -43,6 +43,7 @@ int main(void) {
         bin_tree_search(test_tree, 10000)) {
         fprintf(stderr, "Erase check failed\n");
         rc = EXIT_FAILURE;
+        goto destroy_and_exit;
     }
 
 destroy_and_exit:

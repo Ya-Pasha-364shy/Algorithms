@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <errno.h>
 
 #include "linked_list.h"
 
@@ -149,7 +150,7 @@ bool ll_erase_value(int_linked_list_t *ll, int value_to_erase) {
     return true;
 }
 
-void ll_erase_value_by_idx(int_linked_list_t *ll, int index) {
+void ll_erase_value_by_idx(int_linked_list_t *ll, size_t index) {
     if (index >= ll->size) {
         return;
     }
@@ -188,7 +189,7 @@ void ll_print(int_linked_list_t *ll) {
 
     int_linked_list_node_t *iterator = ll->sentinel_node->next_node;
     printf("[ ");
-    for (int i = 0; i < ll->size-1; i++) {
+    for (size_t i = 0; i < ll->size-1; i++) {
         printf("%d -> ", iterator->payload);
         iterator = iterator->next_node;
     }

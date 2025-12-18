@@ -1,6 +1,8 @@
 #ifndef _BINARY_TREE_SEARCH_H_
 #define _BINARY_TREE_SEARCH_H_
 
+#include <stdbool.h>
+
 typedef struct bin_tree_node_s {
     int key;
     struct bin_tree_node_s *left;
@@ -21,6 +23,10 @@ bool bin_tree_erase(bin_tree_t *tree, int erase_node_value);
 
 void bin_tree_print(bin_tree_t *tree);
 
+void _bin_tree_print(bin_tree_t **tree_wrap);
+
 bool bin_tree_search(bin_tree_t *tree, int search_value);
+
+bool bin_tree_balanced_insert(bin_tree_t **tree, int new_node_value);
 
 #endif // _BINARY_TREE_SEARCH_H_
