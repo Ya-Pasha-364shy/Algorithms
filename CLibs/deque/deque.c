@@ -155,7 +155,7 @@ void deq_print(int_deq_t *deq) {
 
     int_deq_node_t *iterator = deq->sentinel_node->next_node;
     printf("[ ");
-    for (int i = 0; i < deq->size-1; i++) {
+    for (size_t i = 0; i < deq->size-1; i++) {
         printf("%d <-> ", iterator->payload);
         iterator = iterator->next_node;
     }

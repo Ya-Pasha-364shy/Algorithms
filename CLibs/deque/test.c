@@ -14,7 +14,7 @@ int main()
     if (!deq_test) {
         return -1;
     }
-    int tmp_rand, i, j;
+    int tmp_rand, i;
 
     srand(time(NULL));
 

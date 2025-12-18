@@ -53,7 +53,7 @@ bool ll2_erase_value(int_linked_list2_t *ll, int value_to_erase);
 /// @brief Erase value by index in linked list
 /// @param ll Object into which erasing will be performed
 /// @param index Index at which erasure will be performed
-void ll2_erase_value_by_idx(int_linked_list2_t *ll, int index);
+void ll2_erase_value_by_idx(int_linked_list2_t *ll, size_t index);
 
 /// @brief Prints all items of linked list with new-line symbol at the end
 /// @param ll Object in which embedded payload will be output
